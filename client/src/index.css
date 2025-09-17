@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar styles */
+@layer components {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #f3f4f6;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  .scrollbar-track-gray-100::-webkit-scrollbar-track {
+    background: #f3f4f6;
+  }
+
+  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+  }
+
+  /* Document preview responsive container */
+  .document-preview-container {
+    @apply w-full h-full flex flex-col;
+  }
+
+  .document-preview-content {
+    @apply flex-1 overflow-hidden bg-gray-100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .document-preview-paper {
+    @apply bg-white shadow-lg rounded-lg overflow-hidden flex-1;
+    /* A4 portrait dimensions: 210mm x 297mm */
+    width: 100%;
+    /* A4 portrait aspect ratio: 210/297 = 0.707 */
+    aspect-ratio: 210 / 297;
+    margin: 0;
+  }
+
+  .document-preview-text {
+    @apply h-full overflow-y-auto scrollbar-thin p-1;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* Style cho mammoth HTML output để preserve text alignment */
+  .document-preview-text p.normal,
+  .document-preview-text p.paragraph {
+    text-align: center !important;
+    margin: 6px 0;
+    padding: 0;
+  }
+  
+  .document-preview-text h1.title,
+  .document-preview-text h1.heading {
+    text-align: center !important;
+    font-weight: bold;
+    margin: 12px 0 6px 0;
+  }
+  
+  .document-preview-text h2.heading {
+    text-align: center !important;
+    font-weight: bold;  
+    margin: 10px 0 4px 0;
+  }
+
+  @media (max-width: 640px) {
+    .document-preview-text {
+      padding: 4px;
+      font-size: 13px;
+    }
+  }
+}
