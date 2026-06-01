@@ -1,0 +1,68 @@
+Wireframe sơ đồ khối
+Trang: Workflow Field Mapping
+---------------------------------------------------------
+[Header]
+  - Logo App
+  - Tên trang: Workflow Field Mapping
+  - Nút: + Tạo Workflow mới | Tìm kiếm [search box]
+---------------------------------------------------------
+
+[Danh sách Workflows] (toàn hệ thống)
+  -----------------------------------------------------
+  | Tên Workflow | Số bước | Người tạo | Ngày tạo | Trạng thái | Actions |
+  -----------------------------------------------------
+  | Tuyển dụng   |   3     | Admin     | 01/12/25 | Active     | [View]  |
+  | Đào tạo      |   2     | HR        | 02/12/25 | Draft      | [View]  |
+  -----------------------------------------------------
+  - Bộ lọc: [Trạng thái] [Entity] [Ngày]
+  - Bulk actions: Activate / Deactivate / Delete
+---------------------------------------------------------
+
+[Chi tiết Workflow] (khi click View)
+---------------------------------------------------------
+[Header Workflow]
+  - Tên Workflow: Tuyển dụng nhân sự
+  - Trạng thái: Active | Nút Edit | Nút Delete
+
+[Tabs]
+  1. Steps
+  2. Mappings
+  3. Preview
+  4. Audit
+---------------------------------------------------------
+
+[Tab Steps]
+  - Danh sách các bước (templates):
+    Step 1: Hợp đồng lao động
+    Step 2: Quyết định bổ nhiệm
+    Step 3: Thẻ nhân viên
+  - Nút: + Thêm Step | Drag & Drop reorder
+
+[Tab Mappings]
+  -----------------------------------------------------
+  | Source Step | Source Field | → | Target Step | Target Field | Type | Transform | Actions |
+  -----------------------------------------------------
+  | Step 1      | họTên        | → | Step 2      | họTên        | Auto | None      | Edit    |
+  | Step 1      | ngàySinh     | → | Step 2      | dateOfBirth  | Manual | Format dd/MM/yyyy → YYYY-MM-DD | Edit |
+  -----------------------------------------------------
+  - Nút: + Thêm Mapping
+  - Highlight: Auto (xanh), Manual (cam)
+
+[Tab Preview]
+  - Hiển thị dữ liệu mẫu chạy qua các bước
+  - Field: họTên = "Nguyen Van A" → tự động điền vào Step 2, Step 3
+  - Badge: Auto-filled / Needs review / Overridden
+
+[Tab Audit]
+  - Timeline chỉnh sửa: ai, khi nào, thay đổi gì
+---------------------------------------------------------
+
+
+
+🎯 Điểm nhấn thiết kế
+- Toàn hệ thống: bảng workflows với tìm kiếm, filter, CRUD, bulk actions.
+- Trong workflow: tabs Steps (quy trình), Mappings (ánh xạ fields), Preview (xem dữ liệu), Audit (lịch sử).
+- Tương tác ánh xạ: drag & drop, context menu, highlight trạng thái.
+- Quản lý fields: bảng mapping chi tiết, có transform và provenance.
+
+Bạn có muốn tôi vẽ thêm sơ đồ luồng dữ liệu (data flow diagram) song song với wireframe này để nhóm kỹ thuật dễ hình dung backend hoạt động không?

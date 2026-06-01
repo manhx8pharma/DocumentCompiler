@@ -1,0 +1,67 @@
+Sub ExportGPPSelectedData()
+    Dim wsSrc As Worksheet, wsNew As Worksheet
+    Dim wbNew As Workbook
+    Dim lastRow As Long, destRow As Long
+    Dim savePath As String, userNumber As String
+    Dim fileName As String
+    Dim firstM As String, firstL As String
+    Dim rngY As range, firstCell As range, c As range
+    
+    Set wsSrc = ActiveSheet
+    lastRow = wsSrc.Cells(wsSrc.Rows.Count, "B").End(xlUp).Row
+    
+    Set wbNew = Workbooks.Add
+    Set wsNew = wbNew.Sheets(1)
+    
+    ' Tiêu d?
+    wsNew.range("A1").Value = "DOCUMENT_NAME"
+    wsSrc.range("C1:M1").Copy wsNew.range("B1")
+    
+    
+    destRow = 2
+    
+    ' Xác d?nh vùng c?t Y
+    Set rngY = wsSrc.range("Y2:Y" & lastRow)
+    
+    ' Tìm ô d?u tiên có "x"
+    Set c = rngY.Find(What:="x", LookIn:=xlValues, LookAt:=xlWhole)
+    
+    If Not c Is Nothing Then
+        Set firstCell = c
+        Do
+            ' Copy C–M sang B
+            wsSrc.range("C" & c.Row & ":M" & c.Row).Copy wsNew.range("B" & destRow)
+            ' Copy P sang N
+            wsSrc.range("P" & c.Row).Copy wsNew.range("M" & destRow)
+            
+            If firstM = "" Then
+                firstM = wsSrc.Cells(c.Row, "M").Value
+                firstL = wsSrc.Cells(c.Row, "L").Value
+            End If
+            
+            destRow = destRow + 1
+            
+            ' Tìm ô "x" ti?p theo
+            Set c = rngY.FindNext(c)
+        Loop While Not c Is Nothing And c.Address <> firstCell.Address
+    End If
+    
+    ' Công th?c c?t N
+    wsNew.range("N2:N" & destRow - 1).FormulaLocal = "=TEXTBEFORE(B2;""/"")"
+    
+    ' Công th?c c?t A
+    wsNew.range("A2:A" & destRow - 1).FormulaLocal = _
+        "=N2&""_GPP_""&M2&""_""&PROPER(VLOOKUP(M2;'[TD_ho_so_TTHC.xlsx]th_mot_cua_final'!$B$1:$I$9570;8;0))"
+    
+    userNumber = InputBox("Nh?p s? QÐ:", "S? Quy?t d?nh")
+    fileName = firstM & "_" & firstL & "_GPP_QÐ." & userNumber & ".xlsx"
+    savePath = "H:\My Drive\QLHN_KD_duoc\soan_du_thao_vb\cskd_duoc\In\" & fileName
+    
+    wbNew.SaveAs fileName:=savePath, FileFormat:=xlOpenXMLWorkbook
+    For Each c In rngY
+        If LCase(c.Value) = "x" Then
+            c.Value = "dã t?o templateExcel"
+        End If
+    Next c
+    MsgBox "Ðã xu?t d? li?u và luu file: " & savePath
+End Sub

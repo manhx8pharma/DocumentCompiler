@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Edit Page</title>
+</head>
+<body>
+    <h1>Testing Edit Page</h1>
+    <script>
+        // Test if the route works
+        fetch('/api/documents/61ace94a-8a72-48f8-9fb9-c6773af5b2cd')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Document data:', data);
+                document.body.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.body.innerHTML += '<p>Error: ' + error.message + '</p>';
+            });
+
+        fetch('/api/documents/61ace94a-8a72-48f8-9fb9-c6773af5b2cd/fields')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fields data:', data);
+                document.body.innerHTML += '<h2>Fields:</h2><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            })
+            .catch(error => {
+                console.error('Fields Error:', error);
+                document.body.innerHTML += '<p>Fields Error: ' + error.message + '</p>';
+            });
+    </script>
+</body>
+</html>

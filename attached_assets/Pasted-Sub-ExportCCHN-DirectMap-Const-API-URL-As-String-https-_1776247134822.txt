@@ -1,0 +1,122 @@
+Sub ExportCCHN_DirectMap()
+
+    Const API_URL   As String = "https://document-compiler-manhx8.replit.app"
+    Const TMPL_UUID As String = "1cef2836-16cb-43c6-aca0-0302fa03f2d4"
+    Const COL_MARK  As String = "V"   ' column used to mark rows
+    Const COL_RESULT As String = "W"  ' column used to store API results
+
+    Dim wsSrc As Worksheet
+    Dim lastRow As Long
+    Dim rngMark As range, c As range, firstCell As range
+    Dim successN As Integer, errorN As Integer
+
+    Set wsSrc = ActiveSheet
+    lastRow = wsSrc.Cells(wsSrc.Rows.Count, "R").End(xlUp).Row
+    Set rngMark = wsSrc.range(COL_MARK & "2:" & COL_MARK & lastRow)
+
+    ' Step 1: get field names directly from header row of active sheet
+    Dim fieldNames() As String
+    Dim colCount As Long, i As Long
+    colCount = wsSrc.UsedRange.Columns.Count
+    ReDim fieldNames(1 To colCount)
+    For i = 1 To colCount
+        fieldNames(i) = wsSrc.Cells(1, i).Value
+    Next i
+
+    ' Step 2: map field names to columns
+    Dim fieldMap As Object
+    Set fieldMap = CreateObject("Scripting.Dictionary")
+    For i = 1 To colCount
+        If fieldNames(i) <> "" Then
+            fieldMap(fieldNames(i)) = i
+        End If
+    Next i
+
+    ' Step 3: loop through rows marked with "x"
+    successN = 0: errorN = 0
+    Set c = rngMark.Find(What:="x", LookIn:=xlValues, LookAt:=xlPart, MatchCase:=False)
+    If c Is Nothing Then
+        MsgBox "No rows marked with x in column " & COL_MARK
+        Exit Sub
+    End If
+
+    Set firstCell = c
+
+    Do
+        Dim docName As String
+        Dim partBeforeSlash As String
+        Dim lookupVal As Variant, lookupResult As Variant
+        Dim externalPath As String
+        Dim wbExt As Workbook
+
+        externalPath = "H:\My Drive\QLHN_KD_duoc\Data_Excel\TD_ho_so_TTHC.xlsx"
+
+        ' Get text before "/" from column C in active sheet
+        partBeforeSlash = Split(wsSrc.Cells(c.Row, "B").Value, "/")(0)
+
+        ' Value to look up from column P
+        lookupVal = wsSrc.Cells(c.Row, "R").Value
+
+        ' Try to use the workbook if it is open
+        On Error Resume Next
+        Set wbExt = Workbooks("TD_ho_so_TTHC.xlsx")
+        On Error GoTo 0
+
+        If Not wbExt Is Nothing Then
+            ' Workbook is open: use Application.VLookup
+            lookupResult = Application.VLookup(lookupVal, _
+                wbExt.Sheets("th_mot_cua_final").range("B1:I15000"), 8, False)
+        Else
+            ' Workbook is closed: use ExecuteExcel4Macro
+            On Error Resume Next
+            lookupResult = ExecuteExcel4Macro("VLOOKUP(" & lookupVal & ",'[" & externalPath & "]th_mot_cua_final'!R1C2:R15000C9,8,FALSE)")
+            On Error GoTo 0
+        End If
+
+        If IsError(lookupResult) Or IsEmpty(lookupResult) Then
+            lookupResult = ""
+        Else
+            lookupResult = Application.Proper(lookupResult)
+        End If
+
+        ' Build docName
+        docName = partBeforeSlash & "_CCHN_" & lookupVal & "_" & lookupResult
+
+        ' Step 4: collect field values according to mapping
+        Dim fv() As String
+        ReDim fv(1 To UBound(fieldNames))
+        Dim idx As Integer
+        For idx = 1 To UBound(fieldNames)
+            If fieldMap.Exists(fieldNames(idx)) Then
+                fv(idx) = CStr(wsSrc.Cells(c.Row, fieldMap(fieldNames(idx))).Value)
+            Else
+                fv(idx) = ""
+            End If
+        Next idx
+
+        ' Step 5: call API (replace with your own implementation)
+        Dim apiResult As String
+        apiResult = CallDocumentAPI(API_URL, TMPL_UUID, docName, fieldNames, fv, UBound(fieldNames))
+
+        If Left(apiResult, 3) = "OK:" Then
+            Dim uuid As String
+            uuid = Mid(apiResult, 4)
+            wsSrc.Cells(c.Row, COL_RESULT).Value = API_URL & "/document-update/" & uuid
+            ' Replace the "x" marker in column Y with the calculated docName
+            wsSrc.Cells(c.Row, COL_MARK).Value = docName
+            successN = successN + 1
+        Else
+            wsSrc.Cells(c.Row, COL_RESULT).Value = "error: " & apiResult
+            errorN = errorN + 1
+        End If
+
+        ' Move to next marked cell
+        Set c = rngMark.FindNext(c)
+        If c Is Nothing Then Exit Do
+    Loop While c.Address <> firstCell.Address
+
+    MsgBox "Completed!" & vbNewLine & _
+           "API success: " & successN & vbNewLine & _
+           "API failed: " & errorN
+
+End Sub

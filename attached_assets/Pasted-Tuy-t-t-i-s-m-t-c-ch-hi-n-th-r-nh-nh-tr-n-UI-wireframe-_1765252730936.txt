@@ -1,0 +1,45 @@
+Tuyệt 👌, tôi sẽ mô tả cách hiển thị rẽ nhánh trên UI (wireframe) để người dùng dễ thao tác kéo thả và cấu hình điều kiện.
+
+🖼️ Wireframe UI cho Rẽ nhánh Workflow
+1. Canvas chính (Workflow Designer)
+- Dạng sơ đồ khối (flowchart): mỗi step hiển thị dưới dạng ô vuông/khối.
+- Gateway nodes:
+- Exclusive Gateway: hình thoi (diamond), có nhiều nhánh ra, mỗi nhánh gắn điều kiện.
+- Parallel Gateway: hình thoi với ký hiệu “+”, nhiều nhánh song song.
+- Merge Gateway: hình thoi với ký hiệu “∧” hoặc “⊕”, gộp nhiều nhánh về một.
+- Transitions (đường nối): đường kẻ nối giữa các step, có thể gắn label điều kiện.
+
+2. Panel cấu hình điều kiện
+- Khi click vào một nhánh từ gateway → mở panel bên phải:
+- Field selector: dropdown chọn field (ví dụ: salary).
+- Operator selector: =, !=, >, <, >=, <=, in, contains.
+- Value input: nhập giá trị hoặc chọn field khác.
+- Transform rule: checkbox/dropdown (ví dụ: toNumber, uppercase).
+- Logic group: AND/OR, thêm nhiều điều kiện.
+- Preview: hiển thị điều kiện dưới dạng câu logic:
+salary >= 20000000 (toNumber)
+
+3. Panel quản lý nhánh song song
+- Khi click vào Parallel Gateway:
+- Danh sách các nhánh song song (Step 3a, Step 4a…).
+- Nút “+ Add branch” để thêm nhánh.
+- Checkbox “join policy” cho Merge (all/any).
+
+4. Audit & Debug view
+- Tab riêng hiển thị:
+- Decision log: điều kiện nào được đánh giá, kết quả true/false.
+- Selected branch: nhánh nào được chọn.
+- Skipped branches: nhánh nào bị bỏ qua.
+- Tooltip trên mỗi step: hiển thị provenance + audit.
+
+5. Trải nghiệm người dùng
+- Kéo thả trực quan: kéo step vào canvas, nối bằng gateway.
+- Điều kiện hiển thị ngay trên đường nối: ví dụ: salary >= 20m.
+- Highlight nhánh được chọn khi chạy workflow: màu xanh cho nhánh active, màu xám cho nhánh skip.
+- Song song: hiển thị nhiều step chạy đồng thời, Merge step chờ đủ điều kiện.
+
+🎯 Ý nghĩa
+- Trực quan: người dùng thấy rõ ràng luồng rẽ nhánh.
+- Dễ thao tác: kéo thả, cấu hình điều kiện bằng panel.
+- Minh bạch: audit/debug view cho phép kiểm tra quyết định nhánh.
+- Thân thiện: hiển thị logic bằng ngôn ngữ gần gũi, không chỉ là biểu thức kỹ thuật.

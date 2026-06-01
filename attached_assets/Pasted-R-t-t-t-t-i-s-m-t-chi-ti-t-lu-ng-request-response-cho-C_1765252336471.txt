@@ -1,0 +1,85 @@
+Rất tốt 👌, tôi sẽ mô tả chi tiết luồng request–response cho CRUD DocumentInstance – tức là việc tạo, đọc, cập nhật, xóa tài liệu trong một workflow. Đây là phần quan trọng vì nó thể hiện cách dữ liệu thực tế được sinh ra và quản lý trong hệ thống.
+
+🔄 CRUD DocumentInstance – Request/Response
+1. Create DocumentInstance
+- UI hành động: người dùng hoàn thành bước trong workflow (ví dụ: điền Hợp đồng lao động).
+- Request:
+POST /workflows/{workflow_id}/documents
+{
+  "step_id": 1,
+  "template_version": "v1.0",
+  "initial_values": {
+    "hoTen": "Nguyen Van A",
+    "ngaySinh": "01/01/1990"
+  }
+}
+- Document Service: tạo DocumentInstance, lưu FieldValues.
+- Prefill Engine: nếu có bước tiếp theo, chạy ánh xạ để điền dữ liệu.
+- Response:
+{
+  "document_id": 456,
+  "status": "created",
+  "prefilled_next_step": true
+}
+- Audit Log Service: ghi sự kiện create_document.
+
+2. Read DocumentInstance
+- UI hành động: người dùng mở tài liệu đã tạo để xem chi tiết.
+- Request:
+GET /workflows/{workflow_id}/documents/{document_id}
+- Document Service: truy vấn DB, trả về DocumentInstance + FieldValues + provenance.
+- Response:
+{
+  "document_id": 456,
+  "workflow_id": 123,
+  "step_id": 1,
+  "status": "completed",
+  "fields": [
+    { "field_name": "hoTen", "value": "Nguyen Van A", "provenance": null },
+    { "field_name": "ngaySinh", "value": "01/01/1990", "provenance": null }
+  ]
+}
+
+
+
+3. Update DocumentInstance
+- UI hành động: người dùng chỉnh sửa giá trị field (ví dụ sửa ngày sinh).
+- Request:
+PUT /workflows/{workflow_id}/documents/{document_id}
+{
+  "fields": [
+    { "field_name": "ngaySinh", "value": "02/02/1990" }
+  ]
+}
+- Document Service: cập nhật FieldValues, ghi provenance “overridden-by-user”.
+- Response:
+{
+  "document_id": 456,
+  "status": "updated",
+  "fields": [
+    { "field_name": "ngaySinh", "value": "02/02/1990", "provenance": "overridden-by-user" }
+  ]
+}
+- Audit Log Service: ghi sự kiện update_document.
+
+4. Delete DocumentInstance
+- UI hành động: người dùng chọn “Xóa tài liệu”.
+- Request:
+DELETE /workflows/{workflow_id}/documents/{document_id}
+- Document Service: kiểm tra quyền, trạng thái (chỉ cho phép xóa nếu draft hoặc chưa commit).
+- Response:
+{
+  "document_id": 456,
+  "status": "deleted"
+}
+- Audit Log Service: ghi sự kiện delete_document.
+
+🎯 Ý nghĩa
+- Create: sinh tài liệu mới trong workflow, có thể prefill bước tiếp theo.
+- Read: hiển thị chi tiết tài liệu và provenance cho UI.
+- Update: chỉnh sửa dữ liệu, ghi lại nguồn gốc thay đổi.
+- Delete: loại bỏ tài liệu, đảm bảo audit log.
+- Audit log: mọi thao tác CRUD đều được ghi lại để minh bạch và kiểm soát.
+
+👉 Với luồng này, backend có thể triển khai API chuẩn REST/GraphQL, frontend dễ dàng hiển thị và chỉnh sửa tài liệu, đồng thời hệ thống đảm bảo provenance và audit rõ ràng.
+Bạn có muốn tôi tiếp tục mô tả luồng request–response cho CRUD FieldValue (từng giá trị field trong document) để đi sâu hơn vào chi tiết granular không?

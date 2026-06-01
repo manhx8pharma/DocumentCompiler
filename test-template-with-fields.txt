@@ -1,0 +1,14 @@
+This is a test template document.
+
+Employee Name: {{employeeName}}
+Position: {{position}}
+Start Date: {{startDate}}
+Salary: {{salary}}
+Department: {{department}}
+
+This template contains field placeholders for testing the extraction process.
+
+Additional fields:
+- Manager: {{managerName}}
+- Employee ID: {{employeeId}}
+- Location: {{workLocation}}

@@ -1,0 +1,302 @@
+harmacy location map app
+không đúng ý tôi rồi; bạn quên render css để tích option và các hàm tích chọn option khi generate các field này
+
+6 months ago
+nhờ chuyên gia review lại plan rồi triển khai sửa cho tối ưu và tạo được tính năng mong muốn
+
+6 months ago
+rồi hãy sửa app theo kế hoạch vừa rồi
+
+6 months ago
+Trước đây app hỗ trợ nhập liệu giọng nói trên thiết bị android, tại sao giờ không hỗ trợ
+
+6 months ago
+Nếu không phải render ra check box thì mặc định phhải là text input chứ
+
+6 months ago
+Giữ lại cả chức năng toggle single line và multiline nhé
+
+6 months ago
+Tôi sẽ thêm lại nút toggle giữa single-line và multiline cho mỗi field:
+
+Bây giờ cập nhật phần render field để thêm nút toggle:
+
+Đã hoàn thành! Tính năng toggle giữa single-line và multiline hoạt động tốt:
+
+Mặc định: Input 1 dòng (tương thích voice input Android)
+Nút toggle: Bấm icon ở góc phải của mỗi field để chuyển đổi
+Icon 3 gạch (AlignLeft): đang ở chế độ 1 dòng, bấm để chuyển sang nhiều dòng
+Icon 1 gạch (Minus): đang ở chế độ nhiều dòng, bấm để quay lại 1 dòng
+Đã hoàn thành! Bây giờ app có:
+
+Mặc định là ô nhập 1 dòng - tương thích tốt với voice input trên Android
+Nút toggle ở góc phải mỗi field để chuyển sang chế độ nhiều dòng khi cần nhập văn bản dài
+Bạn có thể thử lại voice input trên điện thoại Android để kiểm tra nhé!
+
+Ai architect kiểm tra lại kế boạch làm căn cứ sửa kế hoạch đảm bảo app an toàn (bỏ ẩn đối với những fields table bị ẩn nữa)
+
+2 hours ago
+Còn các fields khác bị ẩn nữa không
+
+2 hours ago
+Sửa tìm kiếm nâng cao — bảng ẩn và độ chính xác
+Tìm kiếm nâng cao có 4 lỗi sau khi review kiến trúc:
+
+Lỗi 1 — Bảng bị ẩn khỏi scope selector (Critical) getSearchableFields chỉ query document_fields.field_name, bỏ qua hoàn toàn các fields kiểu row_group (lưu trong document_table_data). Kết quả: scope selector không hiển thị tên bảng nào → người dùng không thể chọn tìm trong bảng cụ thể.
+
+Lỗi 2 — Table data không tìm được theo mặc định (Critical) includeTableData mặc định là false. Khi chọn "Tất cả fields", SQL hoàn toàn bỏ qua document_table_data. Người dùng phải tự tích ô ẩn "Tìm trong các bảng" để kích hoạt.
+
+Lỗi 3 — Badge đếm sai số hàng khớp (Medium) Step 3 đếm số record trong document_table_data (mỗi record = một cái bảng), không phải số hàng JSON chứa từ khóa. Ví dụ: bảng 50 hàng, 3 hàng khớp → hiển thị "1 hàng khớp".
+
+Lỗi 4 — False positive từ tên cột (Minor) rows::text ILIKE $1 khớp cả tên cột (JSON keys) lẫn giá trị ô. Nếu tên cột trùng từ khóa → document bị trả về không đúng. Tuy nhiên, không được bỏ GIN index vì thay hoàn toàn sang jsonb_each_text sẽ mất prefilter, ảnh hưởng hiệu năng khi data lớn.
+
+Time worked
+5 minutes
+Work done
+13 actions
+Items read
+163 lines
+Code changed
++192
+-96
+Agent Usage
+$1.00
+Ý tưởng về loại placeholder hoàn toàn mới mô tả các đoạn chorus có thể nhân bản tùy ý người dùng trong văn bản (đoạn chorus chứa câu và biến đan xen tùy ngữ cảnh văn bản và ý tưởng của người dùng), tư vấn về name rule loại placeholder này kèm theo name rule và cách quản lý biến trong nó; giao diện tạo creat document có nút nhân bản chorus (+ thêm đoạn chorus) các đoạn chorus nhân bản có chung biến nên quản lý theo dữ liệu kiểu JSON không hoặc đề xuất phương pháp khac tối ưu
+
+58 minutes ago
+Chỉnh Kế hoạch theo hướng mở thêm concept "block" trên nền cấu trúc JSON array row, tuy nhiên cần kiểm tra cú pháp đặt tên biến trong chorus giống ở ngoài có gây lỗi không?
+
+47 minutes ago
+Hãy đề xuất tách biệt name rule cho tên biến trong chorus với biến ngoài block, luồng render và xuất dữ liệu cũng tách biệt để đảm bảo hoạt động chính xác
+
+40 minutes ago
+Ai architect nghiên cứu kỹ toàn bộ để đề xuất hợp lý hơn về kiến trúc, giao diện, cơ chế render, xuất data và đảm bảo an toàn cho app
+
+31 minutes ago
+Để làm được điều này tốt, tôi cần một architect đọc toàn bộ codebase trước. Để research song song.
+
+Waited 19 seconds for background jobs to complete
+Architect đã đọc xong toàn bộ codebase. Tổng hợp đề xuất đầy đủ.
+
+Đề xuất kiến trúc Chorus Block
+Phát hiện quan trọng từ nghiên cứu codebase
+Trước khi vào thiết kế, có 3 điều quan trọng cần biết về cách app đang hoạt động:
+
+1. Bảng (table) không dùng Docxtemplater loop — chúng được inject trực tiếp vào XML (table-injector.ts) trước khi Docxtemplater chạy. Docxtemplater chỉ render {{field}} trên văn bản sau khi bảng đã được nhúng vào.
+
+2. Render hiện tại là một pass duy nhất: doc.render(Record<string,string>). Không có array, không có loop. Toàn bộ kiến trúc được thiết kế quanh flat key-value.
+
+3. Batch processing đã bị block cứng cho row_group fields — vì table data không thể flatten thành Excel row. Chorus block phải xử lý tương tự.
+
+1 — Name Rule
+Hai namespace tách biệt hoàn toàn bằng hai cặp delimiter khác nhau:
+
+Loại	Cú pháp	Quy tắc tên	Ghi chú
+Field thường	{{fieldName}}	camelCase	Giữ nguyên, không thay đổi
+Mở chorus block	{%#BLOCK_NAME%}	UPPER_SNAKE_CASE	Gõ trực tiếp trong Word
+Đóng chorus block	{%/BLOCK_NAME%}	Tên phải khớp mở	
+Biến trong chorus	{%varName%}	camelCase	Chỉ hợp lệ trong block
+Lý do chọn {% %} thay vì {{# }} hay angle-bracket:
+
+{{# }} → regex /\{\{([^{}]+)\}\}/g đang dùng sẽ capture #BLOCK_NAME như một field tên — sai ngay tại bước extract
+<< >> → đã dùng cho table markers, dễ gây nhầm lẫn cho người tạo template
+{% %} → % không phải XML entity, không cần encode; cặp delimiter chưa dùng ở đâu trong codebase; regex /{%([^%]+)%}/g không bao giờ overlap với /{{\{...}\}}/g
+Ví dụ template hợp lệ:
+
+Tên hợp đồng: {{tenHopDong}}
+Ngày ký: {{ngayKy}}
+<<DANH_SACH_HANG_HOA:stt,tenHang,soLuong,donGia>>     ← table (giữ nguyên)
+{%#DIEU_KHOAN_THANH_TOAN%}
+  Đợt {%dot%}: Bên A thanh toán {%soTien%} vào ngày {%ngayThanhToan%}
+  cho hạng mục {%hangMuc%}.
+{%/DIEU_KHOAN_THANH_TOAN%}
+Người ký: {{nguoiKy}}
+2 — Render Mechanism: Two-pass pipeline
+Docxtemplater được gọi hai lần tuần tự, mỗi lần với một delimiter riêng:
+
+template.docx
+      │
+      ▼
+[injectTablesIntoZip]          ← giữ nguyên, chạy trước
+      │
+      ▼
+┌─────────────────────────────────────────┐
+│  PASS 1 — delimiter: {{ }}              │
+│  Input: Record<string, string>          │
+│  { tenHopDong, ngayKy, nguoiKy, ... }   │
+│  → Thay tất cả {{...}}                  │
+│  → {%...%} bị bỏ qua (delimiter khác)  │
+└──────────────┬──────────────────────────┘
+               │ intermediateBuffer (valid .docx)
+               ▼
+┌─────────────────────────────────────────┐
+│  PASS 2 — delimiter: {% %}              │
+│  Input: Record<string, Array<object>>   │
+│  { DIEU_KHOAN_THANH_TOAN: [            │
+│      { dot, soTien, ngayThanhToan, ... }│
+│      { dot, soTien, ngayThanhToan, ... }│
+│  ]}                                     │
+│  → Thay tất cả {%...%} + loop các      │
+│    instance                             │
+│  → {{...}} đã biến mất từ Pass 1       │
+└──────────────┬──────────────────────────┘
+               │ finalBuffer
+               ▼
+          output.docx
+Implementation trong docx-generation.ts:
+
+export function generateDocumentTwoPasses(
+  templateBuffer: Buffer,
+  fieldValues: Record<string, string>,
+  tableDataMap: Record<string, TableData>,
+  blockDataMap: Record<string, Array<Record<string, string>>>
+): Buffer {
+  // Pre-step: inject tables (existing, unchanged)
+  let zip = new PizZip(templateBuffer);
+  if (Object.keys(tableDataMap).length > 0) {
+    zip = injectTablesIntoZip(zip, tableDataMap);
+  }
+  // Pass 1: top-level fields
+  const doc1 = new Docxtemplater(zip, {
+    delimiters: { start: '{{', end: '}}' },
+    parser: createCustomParser(),       // existing — handles default/checklist
+    paragraphLoop: true,
+    linebreaks: true,
+    nullGetter: () => '',
+  });
+  doc1.render(processFieldValues(fieldValues));
+  const intermediate = doc1.getZip().generate({
+    type: 'nodebuffer', compression: 'DEFLATE'
+  });
+  // Pass 2: chorus blocks (only runs if there are any blocks)
+  if (Object.keys(blockDataMap).length === 0) return intermediate;
+  const zip2 = new PizZip(intermediate);
+  const doc2 = new Docxtemplater(zip2, {
+    delimiters: { start: '{%', end: '%}' },
+    paragraphLoop: true,
+    linebreaks: true,
+    nullGetter: () => '',
+  });
+  doc2.render(blockDataMap);
+  return doc2.getZip().generate({ type: 'nodebuffer', compression: 'DEFLATE' });
+}
+Nếu template không có block nào → blockDataMap rỗng → Pass 2 bị skip hoàn toàn → zero overhead cho documents hiện tại.
+
+3 — Data Flow: Storage ↔ Generation ↔ Export
+3a. Storage (Schema thay đổi tối thiểu)
+template_tables  (thêm 1 column)
+  blockType: 'table' | 'block'   DEFAULT 'table'
+  ↑ 1 migration, npm run db:push, existing records unaffected
+document_table_data  (không thay đổi gì)
+  tableName → matches template_tables.name (kể cả block)
+  rows: jsonb  → [{dot, soTien, ngayThanhToan}, ...]
+Tái dùng document_table_data 100% — không cần bảng mới, không cần migration phức tạp.
+
+3b. Load data cho Generation
+// Trong documents.controller.ts — loadTableDataMap được tách thành 2:
+async function loadTableDataMap(documentUuid, templateUuid) {
+  const allRows = await db.query(`
+    SELECT dtd.table_name, dtd.rows, tt.block_type
+    FROM document_table_data dtd
+    JOIN template_tables tt
+      ON tt.template_uuid = $1 AND tt.name = dtd.table_name
+    WHERE dtd.document_uuid = $2
+  `, [templateUuid, documentUuid]);
+  const tableDataMap: Record<string, TableData> = {};
+  const blockDataMap: Record<string, Array<Record<string,string>>> = {};
+  for (const row of allRows.rows) {
+    if (row.block_type === 'block') {
+      blockDataMap[row.table_name] = row.rows;  // đưa vào Pass 2
+    } else {
+      tableDataMap[row.table_name] = { columns: ..., rows: row.rows };  // đưa vào injectTablesIntoZip
+    }
+  }
+  return { tableDataMap, blockDataMap };
+}
+3c. Excel Bulk Export — phân vùng trong workbook
+Hiện tại: 1 template = 1 sheet, mỗi row = 1 document, cột = field values.
+
+Với chorus: mỗi block có sheet riêng trong cùng workbook:
+
+📊 workbook.xlsx
+├── Sheet "TenTemplate"          ← fields thường (giữ nguyên)
+│   DocumentName │ tenHopDong │ nguoiKy │ ...
+│   HĐ-001       │ ...        │ ...     │
+│   HĐ-002       │ ...        │ ...     │
+│
+├── Sheet "DIEU_KHOAN_THANH_TOAN"  ← mỗi block = 1 sheet
+│   DocumentName │ dot │ soTien │ ngayThanhToan │ hangMuc
+│   HĐ-001       │ 1   │ ...    │ ...           │ ...
+│   HĐ-001       │ 2   │ ...    │ ...           │ ...
+│   HĐ-002       │ 1   │ ...    │ ...           │ ...
+│
+└── _ValidationLists             ← hiện có cho checklist
+Mỗi instance = 1 row. Document Name là foreign key để join. Import lại từ Excel cũng có thể reverse-map theo cơ chế tương tự.
+
+4 — UI Design
+Document Create / Update — Chorus Section
+Sau phần fields thường, mỗi chorus block được hiển thị như một accordion:
+
+┌─────────────────────────────────────────────────────────┐
+│ Fields thông tin                                         │
+│  Tên hợp đồng  [_______________]                        │
+│  Ngày ký       [_______________]                        │
+├─────────────────────────────────────────────────────────┤
+│ ▼  Điều khoản thanh toán   (2 đoạn)                    │
+│                                                         │
+│  [Đoạn 1]                              [⬆ ⬇] [🗑]    │
+│    Đợt          [___]                                   │
+│    Số tiền      [_______________]                       │
+│    Ngày TT      [_______________]                       │
+│    Hạng mục     [_______________]                       │
+│                                                         │
+│  [Đoạn 2]                              [⬆ ⬇] [🗑]    │
+│    Đợt          [___]                                   │
+│    ...                                                  │
+│                                                         │
+│  [+ Thêm đoạn]                                         │
+└─────────────────────────────────────────────────────────┘
+Mỗi instance lưu vào document_table_data.rows dưới dạng JSON array
+Thứ tự instances = thứ tự trong array → reorder = swap vị trí trong array
+Autosave 1.5s debounce áp dụng cho cả field và chorus data
+Scope Selector trong Advanced Search
+Bổ sung section "Chorus" vào panel tìm kiếm nâng cao (đã có từ Task #18):
+
+Tìm trong các biến trong chorus block (vd: soTien chứa "500,000")
+Hiển thị badge "N đoạn khớp" (tương tự badge bảng hiện tại)
+5 — An toàn & Edge Cases
+Rủi ro	Biện pháp
+Block mở không có đóng	Validate tại upload: mọi {%#NAME%} phải có {%/NAME%} cùng tên — trả lỗi chi tiết
+Biến trùng tên giữa field và chorus	Warn (không block) lúc upload, ghi rõ tên biến bị trùng
+Block lồng nhau	Không hỗ trợ — validate và trả lỗi rõ nếu phát hiện nested blocks
+Thay thế file template	Extend replaceTemplateFile validation: field parity + block parity (cùng block names, cùng biến trong block)
+Batch processing	Block cứng nếu template có chorus blocks (như đã làm với row_group)
+Pass 2 crash	Wrap trong try-catch riêng, error message rõ "Lỗi render chorus BLOCK_NAME"
+Cache invalidation	document_table_data update → trigger cache invalidation (hiện tại updateDocument đã invalidate cache — cần đảm bảo update chorus data cũng trigger)
+Template preview	Hiển thị một instance rỗng cho mỗi chorus block, wrap bằng đường viền khác biệt
+Interactive preview	Chorus blocks hiển thị dạng "read-only" trong interactive mode — scope quá phức tạp cho inline editing
+Backward compatibility	Tất cả documents hiện tại không có {%...%} → Pass 2 không chạy → zero impact
+6 — Task Breakdown
+T1 — Schema + Extraction + Validation
+
+shared/schema.ts: thêm blockType
+template-field-analyzer.service.ts: regex {%...%}, extract block definitions, validate pairing
+templates.controller.ts: lưu blocks vào template_tables, extend replaceTemplateFile
+batch.controller.ts: block batch nếu template có chorus blocks
+db/index.ts hoặc migration: npm run db:push
+T2 — Two-pass Render Pipeline
+
+docx-parser.ts: thêm createChorusDocxTemplater()
+docx-generation.ts: generateDocumentTwoPasses()
+documents.controller.ts: tách loadTableDataMap → tableDataMap + blockDataMap
+document-generator.ts, document-regenerator.service.ts: dùng two-pass function
+template-processor.service.ts: update preview để handle {%...%} (render một instance rỗng)
+T3 — Frontend: Create & Update UI
+
+Component ChorusBlockSection (accordion, add/remove/reorder)
+document-create.tsx: load block definitions, render chorus sections, submit cùng với field data
+document-update.tsx: load/save chorus instances + autosave debounce
+API: update createDocument và updateDocument endpoints để nhận chorus data
+T4 — Excel Export
+
+bulk-download.controller.ts: thêm per-block sheets vào workbook

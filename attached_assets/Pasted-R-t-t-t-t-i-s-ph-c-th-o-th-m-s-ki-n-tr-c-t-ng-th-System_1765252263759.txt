@@ -1,0 +1,81 @@
+Rất tốt, tôi sẽ phác thảo thêm sơ đồ kiến trúc tổng thể (System Architecture Diagram) cho tính năng Cross-template Field Mapping để bạn thấy rõ cách frontend, backend services và database phối hợp:
+
+🏛️ Kiến trúc tổng thể
++---------------------------+
+|         Frontend          |
+|---------------------------|
+| Web/App UI                |
+| - Trang Workflow Manager  |
+| - Trang Field Mapping     |
+| - Trang Preview & Audit   |
++---------------------------+
+            |
+            v
++---------------------------+
+|       API Gateway         |
+|---------------------------|
+| Xác thực, phân quyền      |
+| Điều phối request         |
++---------------------------+
+            |
+            v
++---------------------------+        +---------------------------+
+|   Workflow Manager Svc    |<----->|   Template Repository Svc  |
+|---------------------------|        |---------------------------|
+| CRUD workflows, steps     |        | Metadata templates, fields|
+| Quản lý trạng thái        |        | Entity, alias dictionary  |
++---------------------------+        +---------------------------+
+            |
+            v
++---------------------------+        +---------------------------+
+|     Mapping Engine Svc    |<----->|   Prefill Engine Svc       |
+|---------------------------|        |---------------------------|
+| Auto/manual mapping       |        | Lấy dữ liệu từ documents  |
+| Transform rules           |        | Ánh xạ sang bước sau      |
+| Conflict resolution       |        | Sinh FieldValues          |
++---------------------------+        +---------------------------+
+            |                                |
+            v                                v
++---------------------------+        +---------------------------+
+|   Document Service Svc    |<----->|   Provenance & Audit Svc   |
+|---------------------------|        |---------------------------|
+| Lưu DocumentInstance      |        | Ghi nguồn gốc field       |
+| Lưu FieldValues           |        | Audit log mọi hành động   |
++---------------------------+        +---------------------------+
+            |
+            v
++---------------------------+
+|       Database Layer      |
+|---------------------------|
+| Tables:                   |
+| - Workflow                |
+| - WorkflowStep            |
+| - Template                |
+| - TemplateField           |
+| - FieldMapping            |
+| - DocumentInstance        |
+| - FieldValue              |
+| - Provenance              |
+| - AuditLog                |
++---------------------------+
+
+
+
+🔄 Luồng hoạt động
+- Frontend (UI): người dùng thao tác trên trang Workflow Field Mapping (CRUD workflows, ánh xạ fields, xem preview).
+- API Gateway: xử lý xác thực, phân quyền, điều phối request đến các service.
+- Workflow Manager Service: quản lý cấu hình workflow, steps.
+- Template Repository Service: cung cấp metadata templates và fields.
+- Mapping Engine Service: thực hiện auto/manual mapping, transform, conflict resolution.
+- Prefill Engine Service: lấy dữ liệu từ documents trước, điền vào bước sau.
+- Document Service: lưu DocumentInstance và FieldValues.
+- Provenance & Audit Service: ghi nguồn gốc dữ liệu và audit log.
+- Database Layer: lưu trữ toàn bộ dữ liệu và quan hệ.
+
+🎯 Ý nghĩa
+- Frontend: tập trung vào trải nghiệm người dùng (quản lý workflows, ánh xạ, preview).
+- Backend services: chia nhỏ theo chức năng (workflow, mapping, prefill, document, audit).
+- Database: nền tảng lưu trữ, đảm bảo tính toàn vẹn và truy xuất nhanh.
+- API Gateway: lớp trung gian bảo mật và điều phối.
+
+Bạn có muốn tôi tiếp tục chi tiết hóa luồng request-response cụ thể (ví dụ: khi người dùng ánh xạ một field, request đi qua các service nào, response trả về ra sao) để nhóm dev backend dễ hình dung hơn không?

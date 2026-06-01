@@ -1,0 +1,87 @@
+Tuyệt 👌, dưới đây là sơ đồ kiến trúc tổng thể dạng ASCII để trực quan hóa toàn bộ các thành phần và luồng dữ liệu trong hệ thống Cross-template Field Mapping:
+
+🖼️ System Architecture Diagram (ASCII)
++---------------------------------------------------+
+|                   Frontend (UI)                   |
+|---------------------------------------------------|
+| - Workflow Field Mapping Page                     |
+| - Steps / Mappings / Preview / Audit Tabs         |
+| - Drag & Drop field mapping                       |
+| - Tooltip provenance                              |
++---------------------------------------------------+
+                        |
+                        v
++---------------------------------------------------+
+|                   API Gateway                     |
+|---------------------------------------------------|
+| - Authentication & Authorization                  |
+| - Routing & Request Logging                       |
++---------------------------------------------------+
+                        |
+                        v
++---------------------------------------------------+
+|               Backend Services Layer              |
+|---------------------------------------------------|
+|                                                   |
+|  +-------------------+   +---------------------+  |
+|  | Workflow Manager  |   | Template Repository|  |
+|  | - CRUD workflows  |   | - Template metadata|  |
+|  | - Steps mgmt      |   | - Field definitions|  |
+|  +-------------------+   +---------------------+  |
+|                                                   |
+|  +-------------------+   +---------------------+  |
+|  | Mapping Engine    |   | Prefill Engine      |  |
+|  | - Auto/manual map |   | - Prefill next step |  |
+|  | - Transform rules |   | - Apply mappings    |  |
+|  | - Conflict resolve|   | - Generate values   |  |
+|  +-------------------+   +---------------------+  |
+|                                                   |
+|  +-------------------+   +---------------------+  |
+|  | Document Service  |   | Provenance Service  |  |
+|  | - CRUD documents  |   | - Track source data |  |
+|  | - FieldValues mgmt|   | - Confidence scores |  |
+|  +-------------------+   +---------------------+  |
+|                                                   |
+|  +-------------------+                            |
+|  | Audit Log Service |                            |
+|  | - Record actions  |                            |
+|  | - Retrieve logs   |                            |
+|  +-------------------+                            |
++---------------------------------------------------+
+                        |
+                        v
++---------------------------------------------------+
+|                   Database Layer                  |
+|---------------------------------------------------|
+| Tables:                                           |
+| - Workflow / WorkflowStep                         |
+| - Template / TemplateField                        |
+| - FieldMapping                                    |
+| - DocumentInstance / FieldValue                   |
+| - Provenance                                      |
+| - AuditLog                                        |
++---------------------------------------------------+
+
+
+
+🔄 Luồng dữ liệu chính
+- UI: người dùng thao tác (CRUD workflows, mappings, documents, fields).
+- API Gateway: xác thực, phân quyền, điều phối request.
+- Workflow Manager: quản lý quy trình & steps.
+- Template Repository: cung cấp metadata fields.
+- Mapping Engine: xử lý ánh xạ auto/manual, transform, conflict.
+- Prefill Engine: điền dữ liệu từ bước trước sang bước sau.
+- Document Service: lưu DocumentInstance & FieldValues.
+- Provenance Service: ghi nguồn gốc dữ liệu.
+- Audit Log Service: ghi lại mọi hành động CRUD.
+- Database Layer: lưu trữ toàn bộ dữ liệu & quan hệ.
+
+🎯 Ý nghĩa
+- Frontend: tập trung vào trải nghiệm người dùng.
+- Backend Services: phân tách rõ chức năng, dễ mở rộng.
+- Database: nền tảng lưu trữ, đảm bảo toàn vẹn dữ liệu.
+- Audit & Provenance: minh bạch, kiểm soát, tuân thủ.
+- Luồng dữ liệu: rõ ràng từ UI → API → Services → DB.
+
+👉 Với sơ đồ này, đội dev có thể coi như một blueprint tổng thể để triển khai hệ thống.
+Bạn có muốn tôi tiếp tục chi tiết hóa luồng end-to-end cho một workflow hoàn chỉnh (ví dụ: từ Step 1 → Step 2 → Step 3, dữ liệu điền tự động, provenance, audit) để mô phỏng thực tế hơn không?

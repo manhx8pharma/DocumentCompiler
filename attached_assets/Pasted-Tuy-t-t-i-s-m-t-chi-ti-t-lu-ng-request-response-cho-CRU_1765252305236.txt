@@ -1,0 +1,82 @@
+Tuyệt, tôi sẽ mô tả chi tiết luồng request–response cho CRUD toàn bộ workflow để hoàn thiện bức tranh tổng thể:
+
+🔄 CRUD Workflow – Request/Response
+1. Create Workflow
+- UI hành động: người dùng nhấn “+ Tạo Workflow mới”, nhập tên, mô tả, thêm steps.
+- Request:
+POST /workflows
+{
+  "name": "Tuyển dụng nhân sự",
+  "status": "draft",
+  "steps": [
+    { "order_index": 1, "template_id": "contract_template" },
+    { "order_index": 2, "template_id": "appointment_template" }
+  ]
+}
+- API Gateway → Workflow Manager Service: kiểm tra quyền, validate dữ liệu.
+- Response:
+{
+  "workflow_id": 123,
+  "status": "created",
+  "steps": [...]
+}
+- Audit Log Service: ghi sự kiện create_workflow.
+
+2. Read Workflow
+- UI hành động: người dùng click vào workflow để xem chi tiết.
+- Request:
+GET /workflows/{workflow_id}
+- Workflow Manager Service: lấy thông tin workflow, steps, mappings từ DB.
+- Response:
+{
+  "workflow_id": 123,
+  "name": "Tuyển dụng nhân sự",
+  "status": "active",
+  "steps": [...],
+  "mappings": [...]
+}
+
+
+
+3. Update Workflow
+- UI hành động: người dùng chỉnh sửa workflow (ví dụ đổi thứ tự steps, thêm mapping).
+- Request:
+PUT /workflows/{workflow_id}
+{
+  "name": "Tuyển dụng nhân sự - bản cập nhật",
+  "status": "active",
+  "steps": [
+    { "order_index": 1, "template_id": "contract_template" },
+    { "order_index": 2, "template_id": "appointment_template" },
+    { "order_index": 3, "template_id": "employee_card_template" }
+  ]
+}
+- Workflow Manager Service: validate, cập nhật DB.
+- Response:
+{
+  "workflow_id": 123,
+  "status": "updated"
+}
+- Audit Log Service: ghi sự kiện update_workflow.
+
+4. Delete Workflow
+- UI hành động: người dùng chọn “Xóa workflow”.
+- Request:
+DELETE /workflows/{workflow_id}
+- Workflow Manager Service: kiểm tra quyền, trạng thái (chỉ cho phép xóa nếu draft hoặc chưa chạy).
+- Response:
+{
+  "workflow_id": 123,
+  "status": "deleted"
+}
+- Audit Log Service: ghi sự kiện delete_workflow.
+
+🎯 Ý nghĩa
+- Create: khởi tạo workflow với steps và mappings ban đầu.
+- Read: hiển thị chi tiết workflow, steps, mappings cho UI.
+- Update: chỉnh sửa cấu hình workflow, thêm/bớt steps, mappings.
+- Delete: loại bỏ workflow khỏi hệ thống, ghi audit.
+- Audit log: mọi hành động CRUD đều được ghi lại để kiểm soát.
+
+👉 Với luồng CRUD này, nhóm backend có thể triển khai API chuẩn REST/GraphQL, frontend dễ dàng tích hợp, và hệ thống đảm bảo tính minh bạch qua audit log.
+Bạn có muốn tôi tiếp tục mô tả luồng request–response cho CRUD FieldMapping (tạo, đọc, cập nhật, xóa ánh xạ field) để hoàn thiện chi tiết hơn không?

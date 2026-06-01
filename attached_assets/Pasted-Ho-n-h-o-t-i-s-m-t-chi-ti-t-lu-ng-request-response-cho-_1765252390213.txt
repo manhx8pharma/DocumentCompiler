@@ -1,0 +1,94 @@
+Hoàn hảo 👌, tôi sẽ mô tả chi tiết luồng request–response cho CRUD AuditLog – tức là quản lý nhật ký hành động toàn hệ thống. Đây là phần cuối cùng để hoàn thiện chuỗi quản lý, đảm bảo mọi thao tác đều được ghi lại và có thể truy xuất.
+
+🔄 CRUD AuditLog – Request/Response
+1. Create AuditLog
+- Hành động: bất kỳ thao tác nào (Create/Update/Delete workflow, mapping, document, field…) đều sinh log.
+- Request (nội bộ, do service gửi):
+POST /auditlogs
+{
+  "workflow_id": 123,
+  "action": "create_mapping",
+  "actor": "user_456",
+  "timestamp": "2025-12-05T12:00:00Z",
+  "details": {
+    "from_field": "ngaySinh",
+    "to_field": "dateOfBirth",
+    "transform": "format dd/MM/yyyy → YYYY-MM-DD"
+  }
+}
+- AuditLog Service: ghi bản ghi vào DB.
+- Response:
+{
+  "audit_id": 999,
+  "status": "created"
+}
+
+
+
+2. Read AuditLog
+- UI hành động: người dùng mở tab Audit để xem lịch sử.
+- Request:
+GET /auditlogs?workflow_id=123
+- AuditLog Service: truy vấn DB, trả về danh sách log.
+- Response:
+[
+  {
+    "audit_id": 999,
+    "workflow_id": 123,
+    "action": "create_mapping",
+    "actor": "user_456",
+    "timestamp": "2025-12-05T12:00:00Z",
+    "details": {...}
+  },
+  {
+    "audit_id": 1000,
+    "workflow_id": 123,
+    "action": "update_document",
+    "actor": "user_789",
+    "timestamp": "2025-12-05T13:00:00Z",
+    "details": {...}
+  }
+]
+
+
+
+3. Update AuditLog
+- Hành động: thường không cho phép chỉnh sửa log (audit phải bất biến).
+- Nếu cần (ví dụ thêm metadata):
+PUT /auditlogs/{audit_id}
+{
+  "details": {
+    "note": "system-corrected"
+  }
+}
+- Response:
+{
+  "audit_id": 999,
+  "status": "updated",
+  "details": { "note": "system-corrected" }
+}
+
+
+
+4. Delete AuditLog
+- Hành động: thường không cho phép xóa log.
+- Nếu cần (theo chính sách): đánh dấu “inactive” thay vì xóa.
+- Request:
+DELETE /auditlogs/{audit_id}
+- Response:
+{
+  "audit_id": 999,
+  "status": "inactive"
+}
+
+
+
+🎯 Ý nghĩa
+- Create: ghi lại mọi hành động trong hệ thống.
+- Read: hiển thị lịch sử cho người dùng hoặc quản trị viên.
+- Update: hiếm khi dùng, chỉ để thêm metadata.
+- Delete/Deactivate: thường không cho phép, nhưng có thể đánh dấu “inactive” nếu cần.
+- Audit log: đảm bảo tính minh bạch, truy xuất nguồn gốc, và tuân thủ quy định.
+
+👉 Với luồng này, hệ thống đã hoàn thiện toàn bộ CRUD cho Workflow, FieldMapping, DocumentInstance, FieldValue, Provenance, AuditLog.
+Bạn có muốn tôi tổng hợp lại thành bản kiến trúc tổng thể end-to-end (từ UI → API → Services → DB) để có cái nhìn toàn cảnh, như một “blueprint” cuối cùng cho đội dev?

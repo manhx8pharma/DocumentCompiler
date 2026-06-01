@@ -1,0 +1,79 @@
+Warning: A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+    at input
+    at _c (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/input.tsx:20:11)
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:79:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:56:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/form.tsx:129:9
+    at div
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/form.tsx:71:6
+    at Controller (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4BFJKWC4.js?v=9b897a31:298:35)
+    at FormField (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/form.tsx:32:6)
+    at div
+    at div
+    at div
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=9b897a31:114:13
+    at div
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+    at Provider (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5AJU3CG7.js?v=9b897a31:38:15)
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=9b897a31:52:7
+    at _c (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/scroll-area.tsx:21:11)
+    at div
+    at form
+    at FormProvider (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4BFJKWC4.js?v=9b897a31:102:11)
+    at div
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LYKCN5SP.js?v=9b897a31:104:7
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:79:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:56:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-FFMOTVC6.js?v=9b897a31:58:5
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=9b897a31:233:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=9b897a31:156:58
+    at Presence (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WIIJQEXM.js?v=9b897a31:24:11)
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=9b897a31:147:64
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:79:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:56:13
+    at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+    at…
+at input
+at _c (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/input.tsx:20:11)
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:79:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:56:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/form.tsx:129:9
+at div
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/form.tsx:71:6
+at Controller (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4BFJKWC4.js?v=9b897a31:298:35)
+at FormField (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/form.tsx:32:6)
+at div
+at div
+at div
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=9b897a31:114:13
+at div
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+at Provider (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5AJU3CG7.js?v=9b897a31:38:15)
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=9b897a31:52:7
+at _c (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/src/components/ui/scroll-area.tsx:21:11)
+at div
+at form
+at FormProvider (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4BFJKWC4.js?v=9b897a31:102:11)
+at div
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LYKCN5SP.js?v=9b897a31:104:7
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:79:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:56:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-FFMOTVC6.js?v=9b897a31:58:5
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=9b897a31:233:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=9b897a31:156:58
+at Presence (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WIIJQEXM.js?v=9b897a31:24:11)
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=9b897a31:147:64
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:79:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2K77HOHX.js?v=9b897a31:56:13
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AXMZZQ2X.js?v=9b897a31:42:13
+at…
+at t.value (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://7e1c0ba5-9d1e-4251-a495-94b7f60f4883-00-pxi8twyq0zu4.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

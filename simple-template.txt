@@ -1,0 +1,9 @@
+Dear {{recipientName}},
+
+This is a test document for {{companyName}}.
+
+Project: {{projectName}}
+Date: {{date}}
+
+Best regards,
+{{senderName}}

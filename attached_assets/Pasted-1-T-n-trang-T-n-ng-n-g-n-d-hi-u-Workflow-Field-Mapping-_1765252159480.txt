@@ -1,0 +1,54 @@
+1. Tên trang
+- Tên ngắn gọn, dễ hiểu:
+- Workflow Field Mapping
+- Liên kết dữ liệu giữa templates
+- Quản lý luồng & ánh xạ trường
+- Nếu app hướng tới người dùng doanh nghiệp, có thể dùng tên chính thức hơn:
+- Workflow Data Linking
+- Cross-template Mapping Manager
+
+2. Cấu trúc luồng phương thức tương tác (giữa các template fields)
+Luồng cơ bản
+- Chọn workflow → người dùng chọn một quy trình (ví dụ: Tuyển dụng nhân sự).
+- Chọn template bước đầu → ví dụ: Hợp đồng lao động.
+- Xem các fields của template → hiển thị danh sách trường (họ tên, ngày sinh, chức vụ…).
+- Chọn template bước kế tiếp → ví dụ: Quyết định bổ nhiệm.
+- Ánh xạ fields:
+- Auto mapping: hệ thống gợi ý các trường trùng tên/alias.
+- Manual mapping: người dùng kéo-thả hoặc chọn nguồn → đích.
+- Transform: thêm quy tắc chuyển đổi (ví dụ format ngày).
+- Xem preview → hiển thị dữ liệu mẫu từ bước trước đã điền vào bước sau.
+- Lưu luồng ánh xạ → tạo thành một “mapping definition” cho workflow.
+Tương tác chính
+- Drag & drop: kéo field từ template A sang field của template B.
+- Context menu: click vào field → chọn “Liên kết tới…” hoặc “Thêm transform”.
+- Highlight: fields đã được ánh xạ hiển thị màu xanh; chưa ánh xạ màu xám.
+
+3. Giao diện quản lý
+Giao diện quản lý trong mỗi luồng (workflow cụ thể)
+- Header: tên workflow, trạng thái (draft/active).
+- Tabs:
+- Steps: danh sách các bước (templates) theo thứ tự.
+- Mappings: bảng ánh xạ field (nguồn → đích, loại ánh xạ, transform).
+- Preview: xem dữ liệu mẫu chạy qua các bước.
+- Actions: thêm bước, chỉnh sửa ánh xạ, xóa ánh xạ, xuất cấu hình.
+Giao diện quản lý toàn bộ các luồng (toàn hệ thống)
+- Danh sách workflows (table view):
+- Cột: Tên workflow  Số bước  Ngày tạo  Người tạo  Trạng thái.
+- Tìm kiếm & filter: theo tên, entity, trạng thái.
+- CRUD:
+- Create: nút “Tạo workflow mới”.
+- Read: click vào workflow để xem chi tiết.
+- Update: chỉnh sửa steps, mappings, transform.
+- Delete: xóa workflow.
+- Bulk actions: bật/tắt nhiều workflows, xuất/import cấu hình.
+- Audit log: hiển thị lịch sử chỉnh sửa.
+
+Tóm tắt
+- Tên trang: Workflow Field Mapping hoặc Quản lý luồng ánh xạ dữ liệu.
+- Luồng tương tác: chọn workflow → chọn templates → ánh xạ fields (auto/manual/transform) → preview → lưu.
+- Giao diện quản lý:
+- Trong luồng: tabs Steps, Mappings, Preview.
+- Toàn hệ thống: bảng workflows với tìm kiếm, CRUD, audit.
+
+Bạn có muốn tôi phác thảo wireframe sơ bộ (dạng text hoặc bảng) cho trang này để dễ hình dung layout UI/UX hơn không?

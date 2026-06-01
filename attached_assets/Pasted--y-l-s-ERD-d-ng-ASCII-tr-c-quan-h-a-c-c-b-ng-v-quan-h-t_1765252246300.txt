@@ -1,0 +1,92 @@
+Đây là sơ đồ ERD dạng ASCII để trực quan hóa các bảng và quan hệ trong hệ thống Cross-template Field Mapping:
++------------------+          +------------------+
+|     Workflow     |1-------N |   WorkflowStep   |
+|------------------|          |------------------|
+| workflow_id (PK) |          | step_id (PK)     |
+| name             |          | workflow_id (FK) |
+| status           |          | order_index      |
+| created_at       |          | template_id (FK) |
+| created_by       |          | required         |
++------------------+          +------------------+
+        |                               |
+        |                               v
+        |                      +------------------+
+        |                      |     Template     |
+        |                      |------------------|
+        |                      | template_id (PK) |
+        |                      | name             |
+        |                      | version          |
+        |                      | description      |
+        |                      +------------------+
+        |                               |
+        |                               v
+        |                      +----------------------+
+        |                      |    TemplateField     |
+        |                      |----------------------|
+        |                      | field_id (PK)        |
+        |                      | template_id (FK)     |
+        |                      | field_name           |
+        |                      | entity_type          |
+        |                      | data_type            |
+        |                      | aliases (JSON)       |
+        |                      +----------------------+
+        |
+        v
++------------------+          +----------------------+
+|   FieldMapping   |N-------1 |    TemplateField     |
+|------------------|          |----------------------|
+| mapping_id (PK)  |          | field_id (PK)        |
+| workflow_id (FK) |          +----------------------+
+| from_step_id (FK)|
+| from_field_id(FK)|
+| to_step_id (FK)  |
+| to_field_id (FK) |
+| match_type       |
+| transform_rule   |
+| priority         |
++------------------+
+
++------------------+          +----------------------+
+| DocumentInstance |1-------N |     FieldValue       |
+|------------------|          |----------------------|
+| document_id (PK) |          | value_id (PK)        |
+| workflow_id (FK) |          | document_id (FK)     |
+| step_id (FK)     |          | field_id (FK)        |
+| template_version |          | value (text)         |
+| status           |          | provenance_id (FK)   |
+| created_at       |          +----------------------+
++------------------+                   |
+                                       v
+                              +------------------+
+                              |    Provenance    |
+                              |------------------|
+                              | provenance_id(PK)|
+                              | source_doc_id(FK)|
+                              | source_field_id  |
+                              | mapping_id (FK)  |
+                              | timestamp        |
+                              | confidence_score |
+                              | transform_applied|
+                              +------------------+
+
++------------------+
+|    AuditLog      |
+|------------------|
+| audit_id (PK)    |
+| workflow_id (FK) |
+| action           |
+| actor            |
+| timestamp        |
+| details (JSON)   |
++------------------+
+
+
+
+🔎 Giải thích nhanh
+- Workflow ↔ WorkflowStep: một workflow có nhiều bước.
+- WorkflowStep ↔ Template ↔ TemplateField: mỗi bước gắn với một template, template có nhiều fields.
+- FieldMapping: ánh xạ field từ step trước sang step sau.
+- DocumentInstance ↔ FieldValue ↔ Provenance: dữ liệu thực tế khi chạy workflow, kèm nguồn gốc.
+- AuditLog: ghi lại mọi hành động để kiểm soát và bảo mật.
+
+Bạn có muốn tôi tiếp tục phác thảo thêm sơ đồ kiến trúc tổng thể (System Architecture Diagram) để thấy rõ cách frontend, backend services và database phối hợp không?

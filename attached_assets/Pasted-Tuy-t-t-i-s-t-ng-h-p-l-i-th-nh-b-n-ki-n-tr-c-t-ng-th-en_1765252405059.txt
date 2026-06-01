@@ -1,0 +1,72 @@
+Tuyệt 👌, tôi sẽ tổng hợp lại thành bản kiến trúc tổng thể end-to-end cho tính năng Cross-template Field Mapping – như một “blueprint” cuối cùng để đội dev có cái nhìn toàn cảnh.
+
+🏛️ Kiến trúc tổng thể End-to-End
+1. Frontend (UI/UX)
+- Trang Workflow Field Mapping
+- Danh sách workflows (CRUD, tìm kiếm, filter).
+- Chi tiết workflow: Tabs Steps, Mappings, Preview, Audit.
+- Tương tác ánh xạ fields: drag & drop, context menu, highlight auto/manual.
+- Tooltip provenance: hiển thị nguồn gốc dữ liệu.
+- Trải nghiệm người dùng
+- Preview dữ liệu chạy qua các bước.
+- Audit panel hiển thị lịch sử chỉnh sửa.
+
+2. API Gateway
+- Xác thực & phân quyền (token, role-based).
+- Điều phối request đến các service.
+- Logging request/response.
+
+3. Backend Services
+- Workflow Manager Service
+- CRUD workflows, steps.
+- Quản lý trạng thái workflow.
+- Template Repository Service
+- Metadata templates, fields, entity, alias dictionary.
+- Mapping Engine Service
+- Auto/manual mapping.
+- Transform rules, conflict resolution.
+- Prefill Engine Service
+- Lấy dữ liệu từ documents trước.
+- Ánh xạ sang bước sau, sinh FieldValues.
+- Document Service
+- CRUD DocumentInstance, FieldValues.
+- Quản lý trạng thái document.
+- Provenance Service
+- Ghi nguồn gốc dữ liệu field.
+- Truy xuất provenance cho UI.
+- Audit Log Service
+- Ghi lại mọi hành động CRUD.
+- Truy xuất lịch sử cho quản trị viên.
+
+4. Database Layer
+- Workflow: định nghĩa quy trình.
+- WorkflowStep: các bước trong workflow.
+- Template: cấu trúc tài liệu.
+- TemplateField: fields trong template.
+- FieldMapping: ánh xạ fields giữa steps.
+- DocumentInstance: tài liệu sinh ra khi chạy workflow.
+- FieldValue: giá trị field trong document.
+- Provenance: nguồn gốc dữ liệu field.
+- AuditLog: nhật ký hành động.
+
+🔄 Luồng dữ liệu End-to-End
+- Người dùng thao tác UI → gửi request CRUD (workflow, mapping, document, field).
+- API Gateway → xác thực, phân quyền, điều phối.
+- Workflow Manager Service → quản lý workflow & steps.
+- Template Repository Service → cung cấp metadata fields.
+- Mapping Engine Service → validate ánh xạ, auto/manual mapping.
+- Prefill Engine Service → điền dữ liệu từ bước trước sang bước sau.
+- Document Service → lưu DocumentInstance & FieldValues.
+- Provenance Service → ghi nguồn gốc dữ liệu.
+- Audit Log Service → ghi lại mọi hành động CRUD.
+- Database Layer → lưu trữ toàn bộ dữ liệu & quan hệ.
+
+🎯 Ý nghĩa
+- Frontend: tập trung vào trải nghiệm người dùng.
+- Backend services: phân tách rõ chức năng, dễ mở rộng.
+- Database: nền tảng lưu trữ, đảm bảo toàn vẹn dữ liệu.
+- Audit & Provenance: minh bạch, kiểm soát, tuân thủ.
+- Luồng dữ liệu: rõ ràng từ UI → API → Services → DB.
+
+👉 Với bản kiến trúc tổng thể này, đội dev có thể coi như một blueprint end-to-end để triển khai.
+Bạn có muốn tôi tiếp tục vẽ sơ đồ tổng thể dạng ASCII (System Architecture Diagram text-based) để trực quan hóa toàn bộ các thành phần và luồng dữ liệu không?

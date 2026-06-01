@@ -1,0 +1,88 @@
+Rất tốt 👌, tôi sẽ mô tả chi tiết luồng request–response cho CRUD FieldMapping để nhóm backend dễ hình dung khi triển khai:
+
+🔄 CRUD FieldMapping – Request/Response
+1. Create FieldMapping
+- UI hành động: người dùng kéo field từ Step A sang Step B, hoặc chọn thủ công.
+- Request:
+POST /workflows/{workflow_id}/mappings
+{
+  "from_step_id": 1,
+  "from_field_id": "A.ngaySinh",
+  "to_step_id": 2,
+  "to_field_id": "B.dateOfBirth",
+  "match_type": "manual",
+  "transform_rule": "format dd/MM/yyyy → YYYY-MM-DD",
+  "priority": 1
+}
+- Workflow Manager Service: kiểm tra workflow, gọi Mapping Engine để validate.
+- Response:
+{
+  "mapping_id": 789,
+  "status": "created",
+  "match_type": "manual"
+}
+- Audit Log Service: ghi sự kiện create_mapping.
+
+2. Read FieldMapping
+- UI hành động: người dùng mở tab Mappings để xem danh sách ánh xạ.
+- Request:
+GET /workflows/{workflow_id}/mappings
+- Workflow Manager Service: truy vấn DB, trả về danh sách mappings.
+- Response:
+[
+  {
+    "mapping_id": 789,
+    "from_field": "ngaySinh",
+    "to_field": "dateOfBirth",
+    "match_type": "manual",
+    "transform_rule": "format dd/MM/yyyy → YYYY-MM-DD"
+  },
+  {
+    "mapping_id": 790,
+    "from_field": "hoTen",
+    "to_field": "hoTen",
+    "match_type": "auto"
+  }
+]
+
+
+
+3. Update FieldMapping
+- UI hành động: người dùng chỉnh sửa transform rule hoặc đổi priority.
+- Request:
+PUT /workflows/{workflow_id}/mappings/{mapping_id}
+{
+  "transform_rule": "uppercase",
+  "priority": 2
+}
+- Mapping Engine Service: validate transform mới.
+- Response:
+{
+  "mapping_id": 789,
+  "status": "updated",
+  "transform_rule": "uppercase",
+  "priority": 2
+}
+- Audit Log Service: ghi sự kiện update_mapping.
+
+4. Delete FieldMapping
+- UI hành động: người dùng chọn “Xóa ánh xạ”.
+- Request:
+DELETE /workflows/{workflow_id}/mappings/{mapping_id}
+- Workflow Manager Service: kiểm tra quyền, trạng thái workflow.
+- Response:
+{
+  "mapping_id": 789,
+  "status": "deleted"
+}
+- Audit Log Service: ghi sự kiện delete_mapping.
+
+🎯 Ý nghĩa
+- Create: thêm ánh xạ mới giữa fields.
+- Read: hiển thị danh sách mappings cho UI.
+- Update: chỉnh sửa transform, priority, hoặc loại ánh xạ.
+- Delete: loại bỏ ánh xạ không cần thiết.
+- Audit log: mọi thao tác CRUD đều được ghi lại để đảm bảo kiểm soát và minh bạch.
+
+👉 Với luồng CRUD này, backend có thể triển khai API REST chuẩn, frontend dễ dàng hiển thị bảng ánh xạ, và hệ thống đảm bảo provenance + audit rõ ràng.
+Bạn có muốn tôi tiếp tục mô tả luồng request–response cho CRUD DocumentInstance (tạo, đọc, cập nhật, xóa tài liệu trong workflow) để hoàn thiện toàn bộ hệ thống không?

@@ -1,0 +1,49 @@
+dưới đây là Sequence Diagram dạng ASCII mô phỏng luồng end-to-end cho một workflow hoàn chỉnh (ví dụ: Tuyển dụng nhân sự với 3 bước: Hợp đồng lao động → Quyết định bổ nhiệm → Thẻ nhân viên).
+
+🖼️ Sequence Diagram (ASCII)
+Người dùng        UI (Frontend)       API Gateway       Workflow Svc     Mapping Svc     Prefill Svc     Document Svc     Provenance Svc     Audit Svc     DB
+    |                   |                   |                 |                |              |               |                 |                 |        |
+    |--- nhập dữ liệu -->|                   |                 |                |              |               |                 |                 |        |
+    |                   |--- POST /doc ---->|                 |                |              |               |                 |                 |        |
+    |                   |                   |--- route ------>|                 |              |               |                 |                 |        |
+    |                   |                   |                 |--- validate --->|              |               |                 |                 |        |
+    |                   |                   |                 |                 |              |               |                 |                 |        |
+    |                   |                   |                 |                 |              |--- prefill --->|                 |                 |        |
+    |                   |                   |                 |                 |              |               |--- save doc ---->|                 |        |
+    |                   |                   |                 |                 |              |               |                 |--- record prov -->|        |
+    |                   |                   |                 |                 |              |               |                 |                 |--- save|
+    |                   |                   |                 |                 |              |               |                 |                 |        |
+    |                   |                   |                 |                 |              |               |                 |                 |        |
+    |<-- hiển thị dữ liệu|                   |                 |                |              |               |                 |                 |        |
+    |                   |<-- response ------|                 |                |              |               |                 |                 |        |
+    |                   |                   |                 |                 |              |               |                 |                 |        |
+    |--- review/commit ->|                   |                 |                 |              |               |                 |                 |        |
+    |                   |--- PUT /doc ----->|                 |                 |              |               |--- update doc -->|                 |        |
+    |                   |                   |--- route ------>|                 |              |               |                 |                 |        |
+    |                   |                   |                 |                 |              |               |                 |                 |--- save|
+    |                   |                   |                 |                 |              |               |                 |                 |        |
+    |                   |                   |                 |                 |              |               |                 |--- log action -->|        |
+    |                   |                   |                 |                 |              |               |                 |                 |        |
+
+
+
+🔎 Giải thích các bước
+- Người dùng nhập dữ liệu ở Step 1 (Hợp đồng lao động).
+- UI gửi request tạo DocumentInstance → API Gateway → Workflow Service.
+- Workflow Service gọi Mapping Service để kiểm tra ánh xạ.
+- Prefill Service chuẩn bị dữ liệu cho Step tiếp theo.
+- Document Service lưu DocumentInstance và FieldValues.
+- Provenance Service ghi nguồn gốc dữ liệu (manual-entry hoặc mapped).
+- Audit Service ghi log hành động.
+- DB lưu toàn bộ dữ liệu.
+- UI hiển thị dữ liệu prefill cho người dùng review.
+- Người dùng commit → Document Service cập nhật → Provenance + Audit ghi lại.
+
+🎯 Ý nghĩa
+- Sequence diagram cho thấy rõ tương tác tuần tự giữa các thành phần.
+- Người dùng thao tác → UI → API Gateway → Services → DB → phản hồi về UI.
+- Provenance và Audit luôn được ghi lại song song để đảm bảo minh bạch.
+- Prefill Engine đóng vai trò trung gian, tự động điền dữ liệu từ bước trước sang bước sau.
+
+👉 Với sơ đồ này, đội dev có thể dễ dàng hình dung luồng tuần tự end-to-end khi chạy một workflow.
+Bạn có muốn tôi tiếp tục mô tả sequence diagram cho CRUD Workflow (tạo, đọc, cập nhật, xóa workflow) để thấy rõ các tương tác tuần tự trong quản lý quy trình không?

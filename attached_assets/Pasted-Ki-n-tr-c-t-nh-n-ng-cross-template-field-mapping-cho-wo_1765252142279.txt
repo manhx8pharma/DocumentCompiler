@@ -1,0 +1,165 @@
+Kiến trúc tính năng cross-template field mapping cho workflow document generation
+Tính năng này chạm vào dữ liệu, quy trình, ánh xạ và nguồn gốc (provenance). Mục tiêu: đảm bảo trường ở bước sau được điền chính xác từ các tài liệu đã hoàn thành ở bước trước, dựa trên quan hệ thực thể (entity) và liên kết thủ công, với kiểm soát xung đột, audit rõ ràng và trải nghiệm người dùng mượt.
+
+Khái niệm và phạm vi
+- Workflow: Tập các bước có thứ tự, mỗi bước sinh một document từ một template.
+- Entity: Chủ thể dữ liệu chung (ví dụ: Person, Company, Contract). Mỗi field thuộc một entity xác định.
+- Field mapping: Cơ chế liên kết nguồn → đích giữa fields của các templates trong workflow.
+- Auto mapping: Dựa trên tên trùng, alias, type, và entity để tự động liên kết.
+- Manual mapping: Người dùng cấu hình cụ thể nguồn dữ liệu cho từng field đích.
+- Provenance: Lưu nguồn gốc cho từng field: lấy từ document nào, field nào, thời điểm nào.
+- Resolution policy: Quy tắc xử lý khi có nhiều nguồn phù hợp hoặc giá trị thay đổi.
+
+Mô hình dữ liệu
+Thực thể cốt lõi
+- Template
+- id, name, version, entityBindings: danh sách {fieldName, entityType, dataType, aliases[]}
+- Workflow
+- id, name, steps[]: {stepOrder, templateId, required, conditions}
+- FieldMapping
+- id, workflowId, fromStepOrder, fromField, toStepOrder, toField
+- matchType: auto  manual  rule-based
+- transform: optional (expression/pipeline)
+- priority: số nguyên để phân xử xung đột
+- DocumentInstance
+- id, workflowId, stepOrder, templateVersion, status
+- FieldValue
+- documentId, fieldName, value, entityType, dataType, provenanceId
+- Provenance
+- id, sourceDocumentId, sourceFieldName, mappingId, timestamp, confidence, transformApplied
+- AliasDictionary
+- entityType, canonicalName, aliases[], locale
+- MappingRule
+- id, workflowId, scope: entityType  template  global
+- predicate: điều kiện (ví dụ: dataType match, alias match, regex)
+- transform: chuẩn hóa (ví dụ: date format, trimming, normalization)
+- conflictPolicy: first-win  last-win  highest-confidence  manual-confirm
+
+Luồng hoạt động
+Tạo và cấu hình workflow
+- Chọn templates và sắp xếp bước: định nghĩa steps theo thứ tự.
+- Gán entity cho fields: xác định entityType cho từng field (có thể kế thừa từ template).
+- Auto mapping đề xuất: hệ thống chạy thuật toán đề xuất liên kết:
+- Trùng tên chính xác hoặc alias trong cùng entityType.
+- Trùng dataType và độ tương tự tên theo fuzzy match (ví dụ: Levenshtein).
+- Field ở bước trước có provenance rõ và confidence cao.
+- Manual mapping: người dùng duyệt, chỉnh sửa, thêm transform (ví dụ: "dd/MM/yyyy" → "YYYY-MM-DD").
+- Đặt resolution policy: khi nhiều nguồn có thể điền một field, xác định ưu tiên và hành vi.
+Chạy workflow
+- Hoàn thành bước N: sinh DocumentInstance, lưu FieldValues và Provenance.
+- Chuẩn bị bước N+1: engine tìm các FieldMappings có toStepOrder = N+1, áp dụng transform, điền trước các FieldValues.
+- Validation: kiểm tra type, constraints (required, pattern). Field nào không hợp lệ được gắn trạng thái “needs review”.
+- User review: người dùng thấy các field đã pre-fill, xem nguồn gốc, chấp nhận/sửa.
+- Commit: lưu document, cập nhật Provenance với transformApplied và confidence.
+
+Thuật toán auto mapping
+- Input: templates của workflow, alias dictionary, mapping rules.
+- Bước 1: Lọc theo entityType
+- Chỉ xem fields cùng entityType; nếu không có entityType, suy luận từ group/section hoặc tên template.
+- Bước 2: Khớp tên
+- Exact match theo canonicalName.
+- Alias match: canonical ↔ alias trùng (ví dụ: “ngàySinh” ↔ “dateOfBirth”).
+- Fuzzy match với ngưỡng tương tự, ưu tiên các cặp cùng dataType.
+- Bước 3: Kiểm tra dataType và constraints
+- Chỉ chấp nhận mapping nếu dataType compatible (string↔string, date↔date, number↔number).
+- Bước 4: Xếp hạng
+- Score = nameMatchScore + aliasScore + typeMatchBonus + entityMatchBonus.
+- Sinh đề xuất với confidence; nếu vượt ngưỡng, tạo auto mapping, nếu dưới, gợi ý manual.
+- Bước 5: Transform mặc định
+- Áp dụng transform từ MappingRule theo entityType (ví dụ: chuẩn hóa địa chỉ, format ngày).
+
+Chính sách xử lý xung đột và cập nhật
+- Nhiều nguồn cho một field đích:
+- Theo priority trong FieldMapping.
+- Hoặc theo conflictPolicy: first-win, last-win, highest-confidence, manual-confirm.
+- Giá trị nguồn thay đổi sau khi đã điền:
+- Lock-on-commit: giá trị tại thời điểm commit bước trước được cố định cho bước sau.
+- Propagate-on-change (opt-in): nếu bật, hệ thống gửi “update suggestion” cho các bước sau chưa commit; cần user review.
+- Override của người dùng:
+- Người dùng thay đổi giá trị → provenance vẫn lưu nguồn gốc ban đầu + “overridden-by-user”.
+- Lần chạy sau, học “preference” (tăng trọng số cho nguồn người dùng hay chọn).
+
+API và eventing
+REST/GraphQL gợi ý
+- POST /workflows
+- Tạo workflow với steps, mappingPolicy.
+- POST /workflows/{id}/auto-mappings
+- Trả về danh sách đề xuất mappings với confidence.
+- PUT /workflows/{id}/mappings
+- Lưu manual/adjusted mappings.
+- POST /documents
+- Tạo document cho step; có payload initialValues.
+- POST /documents/{id}/prefill
+- Engine thực thi field mapping, trả về prefilled values + provenance.
+- GET /documents/{id}/provenance
+- Truy xuất nguồn gốc field-level.
+- POST /documents/{id}/commit
+- Lưu giá trị cuối cùng, khóa provenance.
+Sự kiện
+- DocumentCompleted(stepOrder): trigger prefill cho bước tiếp theo.
+- FieldUpdated: nếu propagate-on-change bật, phát “update suggestion”.
+- MappingChanged: invalidate cache và re-evaluate prefill cho các bước chưa commit.
+
+UI/UX đề xuất
+- Workflow builder:
+- Danh sách steps, kéo-thả sắp xếp.
+- Tab “Mappings”: bảng nguồn→đích, filter theo entity, badge “auto/manual”, confidence bar, transform chip.
+- Document form:
+- Field đã prefill hiển thị nguồn gốc (tooltip: “Từ Hợp đồng lao động — {{họTên}}”).
+- Badge trạng thái: “Auto-filled”, “Needs review”, “Overridden”.
+- One-click “Accept all prefilled” hoặc “Review suggestions”.
+- Conflict dialog:
+- Hiển thị các nguồn, điểm số, preview sau transform, chọn nguồn, đặt làm mặc định cho lần sau.
+- Audit panel:
+- Timeline provenance cho từng field, ai sửa, khi nào, từ đâu.
+
+Bảo mật, quyền hạn và audit
+- Access control theo workflow/document:
+- Người dùng chỉ thấy dữ liệu từ steps họ có quyền.
+- Field-level permissions:
+- Một số field nhạy cảm (ví dụ lương) chỉ prefill nếu người dùng có quyền.
+- Audit immutable:
+- Provenance ghi bất biến; chỉnh sửa chỉ thêm sự kiện, không ghi đè lịch sử.
+- Data minimization:
+- Chỉ cache giá trị cần cho bước kế tiếp; mã hóa at-rest cho fields nhạy cảm.
+
+Hiệu năng và độ tin cậy
+- Prefill engine caching:
+- Cache FieldValues theo entityId + canonicalName với TTL ngắn để giảm truy vấn.
+- Batch prefill:
+- Prefill theo batch cho nhiều fields, giảm round-trip.
+- Idempotency:
+- Prefill có requestId; gọi lặp lại không tạo provenance trùng.
+- Back-pressure:
+- Event queue cho DocumentCompleted; giới hạn rate để tránh bão cập nhật.
+
+Edge cases
+- Template thay đổi version giữa chừng:
+- Lưu templateVersion trên DocumentInstance; auto-mapping re-evaluate chỉ cho fields còn tồn tại; flag “deprecated”.
+- Null/empty nguồn:
+- Không điền; đánh “missing source”; gợi ý người dùng nhập.
+- Multi-entity trong một template:
+- Cho phép sections theo entity khác nhau; mapping chạy theo section scope.
+- Locale/format:
+- Ngày, số, tiền tệ cần transform theo locale của workflow.
+- Derived fields:
+- Field đích là công thức (ví dụ: fullName = firstName + lastName) → transform pipeline.
+
+Lộ trình triển khai
+- Phase 1 – Nền tảng:
+- Mô hình dữ liệu, builder workflow, manual mapping, prefill cơ bản, provenance, audit.
+- Phase 2 – Auto mapping & rules:
+- Alias dictionary, fuzzy match, transform chuẩn, conflict policies.
+- Phase 3 – UX nâng cao:
+- Confidence visualization, review suggestions, batch accept, audit timeline.
+- Phase 4 – Quyền và bảo mật:
+- Field-level permissions, encryption, propagate-on-change với review.
+- Phase 5 – Tối ưu hiệu năng:
+- Cache, batch, idempotency, eventing ổn định.
+
+Tiêu chí thành công
+- Tỷ lệ auto-fill hợp lệ cao (ví dụ >80% fields thuộc cùng entity được điền đúng).
+- Giảm thời gian nhập liệu ở bước sau ít nhất 50%.
+- Provenance rõ ràng cho 100% fields có nguồn.
+- Không rò rỉ dữ liệu qua quyền hạn; audit đầy đủ.
+Nếu bạn muốn, tôi có thể soạn nhanh một schema JSON mẫu cho Template và FieldMapping, hoặc phác thảo màn hình “Mappings” để nhóm dev UI bắt tay vào làm ngay. Bạn có thông tin về các entity chính (Person, Company, Contract…) và danh sách templates ưu tiên để tôi tinh chỉnh alias và rules?

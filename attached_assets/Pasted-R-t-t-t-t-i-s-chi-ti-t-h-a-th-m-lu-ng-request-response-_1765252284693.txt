@@ -1,0 +1,74 @@
+Rất tốt 👌, tôi sẽ chi tiết hóa thêm luồng request–response cụ thể để nhóm backend dễ hình dung khi người dùng thao tác ánh xạ field trong trang Workflow Field Mapping:
+
+🔄 Luồng request–response: ánh xạ một field
+1. Người dùng thao tác UI
+- Hành động: kéo field ngàySinh từ Template A (Step 1) sang field dateOfBirth của Template B (Step 2).
+- Frontend gửi request:
+POST /workflows/{workflow_id}/mappings
+{
+  "from_step_id": 1,
+  "from_field_id": "A.ngaySinh",
+  "to_step_id": 2,
+  "to_field_id": "B.dateOfBirth",
+  "match_type": "manual",
+  "transform_rule": "format dd/MM/yyyy → YYYY-MM-DD"
+}
+
+
+2. API Gateway
+- Xử lý: xác thực token, kiểm tra quyền (user có quyền sửa workflow này không).
+- Điều phối: chuyển request đến Workflow Manager Service.
+3. Workflow Manager Service
+- Xử lý: kiểm tra workflow tồn tại, trạng thái cho phép chỉnh sửa.
+- Gọi Mapping Engine Service: để validate ánh xạ.
+4. Mapping Engine Service
+- Xử lý:
+- Kiểm tra dataType của ngàySinh (date) và dateOfBirth (date).
+- Áp dụng transform rule.
+- Tạo bản ghi FieldMapping với match_type = manual.
+- Response: trả về object mapping đã lưu.
+5. Workflow Manager Service
+- Lưu: ghi FieldMapping vào DB.
+- Audit: gửi sự kiện đến Audit Log Service.
+6. Audit Log Service
+- Ghi log:
+{
+  "workflow_id": 123,
+  "action": "create_mapping",
+  "actor": "user_456",
+  "timestamp": "...",
+  "details": {
+    "from_field": "ngaySinh",
+    "to_field": "dateOfBirth",
+    "transform": "format dd/MM/yyyy → YYYY-MM-DD"
+  }
+}
+
+
+7. Response về Frontend
+- Payload trả về:
+{
+  "mapping_id": 789,
+  "status": "created",
+  "from_field": "ngaySinh",
+  "to_field": "dateOfBirth",
+  "match_type": "manual",
+  "transform_rule": "format dd/MM/yyyy → YYYY-MM-DD"
+}
+- UI cập nhật: hiển thị đường nối giữa hai fields, badge “Manual Mapping”.
+
+🧩 Luồng khi chạy workflow (Prefill)
+- Người dùng hoàn thành Step 1 (Hợp đồng lao động).
+→ Document Service lưu DocumentInstance + FieldValues.
+- Prefill Engine Service nhận sự kiện DocumentCompleted.
+→ Tìm FieldMappings có from_step_id = 1.
+- Áp dụng transform và điền dữ liệu vào Step 2 (Quyết định bổ nhiệm).
+- Provenance Service ghi nguồn gốc: field dateOfBirth lấy từ ngaySinh của Step 1.
+- Frontend hiển thị: field dateOfBirth đã auto-filled, tooltip “Nguồn: Hợp đồng lao động – ngàySinh”.
+
+🎯 Ý nghĩa
+- Rõ ràng từng bước: từ UI → API Gateway → Workflow Manager → Mapping Engine → Document Service → Audit.
+- Đảm bảo kiểm soát: mỗi thao tác đều được ghi log, provenance rõ ràng.
+- Trải nghiệm người dùng: thao tác ánh xạ trực quan, kết quả phản hồi tức thì.
+
+Bạn có muốn tôi tiếp tục mô tả luồng request–response cho CRUD toàn bộ workflow (Create, Read, Update, Delete) để hoàn thiện bức tranh tổng thể không?

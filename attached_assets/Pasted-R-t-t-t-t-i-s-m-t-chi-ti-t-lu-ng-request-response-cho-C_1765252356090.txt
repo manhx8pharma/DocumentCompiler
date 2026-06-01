@@ -1,0 +1,80 @@
+Rất tốt 👌, tôi sẽ mô tả chi tiết luồng request–response cho CRUD FieldValue – tức là thao tác trực tiếp trên từng giá trị field trong DocumentInstance. Đây là mức granular nhất, giúp hệ thống kiểm soát dữ liệu từng trường.
+
+🔄 CRUD FieldValue – Request/Response
+1. Create FieldValue
+- UI hành động: người dùng nhập dữ liệu mới cho một field trong document (ví dụ: nhập họ tên).
+- Request:
+POST /documents/{document_id}/fields
+{
+  "field_id": "hoTen",
+  "value": "Nguyen Van A"
+}
+- Document Service: tạo bản ghi FieldValue, gắn provenance = manual-entry.
+- Response:
+{
+  "value_id": 101,
+  "field_id": "hoTen",
+  "value": "Nguyen Van A",
+  "provenance": "manual-entry",
+  "status": "created"
+}
+- Audit Log Service: ghi sự kiện create_field_value.
+
+2. Read FieldValue
+- UI hành động: người dùng mở document để xem chi tiết từng field.
+- Request:
+GET /documents/{document_id}/fields/{field_id}
+- Document Service: truy vấn DB, trả về giá trị và provenance.
+- Response:
+{
+  "value_id": 101,
+  "field_id": "hoTen",
+  "value": "Nguyen Van A",
+  "provenance": {
+    "source": "manual-entry",
+    "timestamp": "2025-12-05T12:00:00Z"
+  }
+}
+
+
+
+3. Update FieldValue
+- UI hành động: người dùng chỉnh sửa giá trị field (ví dụ sửa họ tên).
+- Request:
+PUT /documents/{document_id}/fields/{field_id}
+{
+  "value": "Nguyen Van B"
+}
+- Document Service: cập nhật FieldValue, provenance = overridden-by-user.
+- Response:
+{
+  "value_id": 101,
+  "field_id": "hoTen",
+  "value": "Nguyen Van B",
+  "provenance": "overridden-by-user",
+  "status": "updated"
+}
+- Audit Log Service: ghi sự kiện update_field_value.
+
+4. Delete FieldValue
+- UI hành động: người dùng xóa giá trị field (ví dụ bỏ trống ngày sinh).
+- Request:
+DELETE /documents/{document_id}/fields/{field_id}
+- Document Service: kiểm tra quyền, trạng thái document.
+- Response:
+{
+  "value_id": 102,
+  "field_id": "ngaySinh",
+  "status": "deleted"
+}
+- Audit Log Service: ghi sự kiện delete_field_value.
+
+🎯 Ý nghĩa
+- Create: thêm giá trị mới cho field.
+- Read: hiển thị chi tiết giá trị + provenance.
+- Update: chỉnh sửa giá trị, ghi lại nguồn gốc thay đổi.
+- Delete: loại bỏ giá trị field, đảm bảo audit log.
+- Audit log: mọi thao tác CRUD đều được ghi lại để minh bạch và kiểm soát.
+
+👉 Với luồng này, hệ thống có thể quản lý dữ liệu ở mức field-level, đảm bảo provenance rõ ràng và audit đầy đủ.
+Bạn có muốn tôi tiếp tục mô tả luồng request–response cho CRUD Provenance (quản lý nguồn gốc dữ liệu của field) để hoàn thiện toàn bộ chuỗi quản lý không?

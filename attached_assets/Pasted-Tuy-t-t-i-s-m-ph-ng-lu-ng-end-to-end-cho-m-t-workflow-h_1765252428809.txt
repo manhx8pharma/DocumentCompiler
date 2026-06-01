@@ -1,0 +1,60 @@
+Tuyệt 👌, tôi sẽ mô phỏng luồng end-to-end cho một workflow hoàn chỉnh để bạn hình dung thực tế cách dữ liệu đi qua các bước, provenance được ghi lại, và audit log hoạt động.
+
+🏃‍♂️ Luồng End-to-End: Ví dụ Workflow Tuyển dụng nhân sự
+Step 1 – Hợp đồng lao động
+- Người dùng mở Step 1 và nhập dữ liệu:
+- hoTen = "Nguyen Van A"
+- ngaySinh = "01/01/1990"
+- chucVu = "Nhân viên"
+- Document Service tạo DocumentInstance #101, lưu FieldValues.
+- Provenance Service ghi nguồn gốc: tất cả fields = manual-entry.
+- Audit Log Service ghi sự kiện create_document.
+
+Step 2 – Quyết định bổ nhiệm
+- Prefill Engine nhận sự kiện DocumentCompleted từ Step 1.
+- Mapping Engine tìm FieldMappings:
+- hoTen (Step1) → hoTen (Step2) (auto mapping).
+- ngaySinh (Step1) → dateOfBirth (Step2) (manual mapping + transform).
+- Prefill Engine điền dữ liệu:
+- hoTen = "Nguyen Van A"
+- dateOfBirth = "1990-01-01" (transform từ dd/MM/yyyy → YYYY-MM-DD).
+- Người dùng review, chấp nhận dữ liệu.
+- Document Service tạo DocumentInstance #102, lưu FieldValues.
+- Provenance Service ghi nguồn gốc:
+- hoTen: từ Document #101, field hoTen.
+- dateOfBirth: từ Document #101, field ngaySinh, transform applied.
+- Audit Log Service ghi sự kiện prefill_document.
+
+Step 3 – Thẻ nhân viên
+- Prefill Engine nhận sự kiện DocumentCompleted từ Step 2.
+- Mapping Engine tìm FieldMappings:
+- hoTen (Step2) → tenNhanVien (Step3).
+- chucVu (Step1) → chucVu (Step3) (manual mapping).
+- Prefill Engine điền dữ liệu:
+- tenNhanVien = "Nguyen Van A"
+- chucVu = "Nhân viên"
+- Người dùng review, chỉnh sửa nếu cần.
+- Document Service tạo DocumentInstance #103, lưu FieldValues.
+- Provenance Service ghi nguồn gốc:
+- tenNhanVien: từ Document #102, field hoTen.
+- chucVu: từ Document #101, field chucVu.
+- Audit Log Service ghi sự kiện create_document.
+
+🔎 Tổng hợp luồng dữ liệu
+- Frontend (UI): người dùng nhập dữ liệu, xem preview, chấp nhận prefill.
+- API Gateway: xác thực, điều phối request.
+- Workflow Manager: quản lý cấu hình workflow.
+- Mapping Engine + Prefill Engine: xử lý ánh xạ, điền dữ liệu tự động.
+- Document Service: lưu DocumentInstance & FieldValues.
+- Provenance Service: ghi nguồn gốc cho từng field.
+- Audit Log Service: ghi lại mọi hành động CRUD.
+- Database Layer: lưu trữ toàn bộ dữ liệu và quan hệ.
+
+🎯 Ý nghĩa
+- Tiết kiệm thời gian nhập liệu: dữ liệu từ bước trước tự động điền vào bước sau.
+- Minh bạch: provenance cho từng field, biết rõ nguồn gốc.
+- Kiểm soát: audit log ghi lại mọi hành động.
+- Trải nghiệm người dùng: preview rõ ràng, dễ review và chỉnh sửa.
+
+👉 Với mô phỏng này, bạn có thể hình dung toàn bộ workflow end-to-end: từ nhập liệu ban đầu → ánh xạ → prefill → provenance → audit.
+Bạn có muốn tôi tiếp tục vẽ sơ đồ sequence diagram dạng ASCII để trực quan hóa các tương tác giữa người dùng, UI, services, và DB trong luồng end-to-end này không?

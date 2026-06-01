@@ -1,0 +1,70 @@
+oàn hảo, tôi sẽ phác thảo thêm sơ đồ luồng dữ liệu (Data Flow Diagram – DFD) song song với wireframe để nhóm kỹ thuật dễ hình dung backend hoạt động của tính năng Cross-template Field Mapping:
+
+🗂️ Data Flow Diagram (DFD – mức khái quát)
+[Người dùng]
+    |
+    v
+[UI Workflow Field Mapping Page]
+    |--- (CRUD workflows, steps, mappings)
+    v
+[Workflow Manager Service]
+    |--- tạo/sửa/xóa workflow
+    |--- quản lý steps & templates
+    |
+    +--> [Template Repository]
+    |       - metadata templates
+    |       - field definitions (entity, datatype, alias)
+    |
+    +--> [Mapping Engine]
+            - auto mapping (name/alias/type match)
+            - manual mapping (user config)
+            - transform rules
+            - conflict resolution
+            |
+            v
+        [Prefill Engine]
+            - lấy dữ liệu từ DocumentInstance bước trước
+            - áp dụng mapping + transform
+            - sinh FieldValues cho bước sau
+            |
+            v
+        [Document Service]
+            - lưu DocumentInstance
+            - lưu FieldValues
+            - ghi Provenance (nguồn gốc dữ liệu)
+            |
+            v
+        [Audit Log Service]
+            - ghi lại hành động (create/update/delete mapping, commit document)
+
+
+
+🔄 Luồng dữ liệu chính
+- Người dùng thao tác UI
+- Tạo workflow, thêm steps, ánh xạ fields.
+- CRUD workflows và mappings.
+- Workflow Manager Service
+- Lưu cấu hình workflow và mappings.
+- Gọi Template Repository để lấy metadata fields.
+- Mapping Engine
+- Đề xuất auto mapping dựa trên alias dictionary.
+- Cho phép manual mapping.
+- Áp dụng transform rules.
+- Prefill Engine
+- Khi document bước N hoàn thành → lấy FieldValues.
+- Ánh xạ sang bước N+1 theo mapping.
+- Sinh dữ liệu prefill cho document mới.
+- Document Service
+- Lưu DocumentInstance và FieldValues.
+- Ghi Provenance cho từng field (nguồn, transform, thời điểm).
+- Audit Log Service
+- Ghi lại mọi hành động để phục vụ kiểm tra và bảo mật.
+
+🎯 Ý nghĩa sơ đồ
+- Frontend (UI): quản lý workflows, ánh xạ, preview.
+- Backend services: Workflow Manager, Mapping Engine, Prefill Engine, Document Service, Audit Log.
+- Repositories: Template Repository (metadata), Document DB (instances + values).
+- Luồng dữ liệu: từ người dùng → cấu hình workflow → ánh xạ fields → prefill documents → lưu provenance → audit.
+
+👉 Với sơ đồ này, nhóm kỹ thuật có thể dễ dàng phân tách frontend (UI/UX) và backend (services, DB), đồng thời hình dung rõ cách dữ liệu chảy qua hệ thống.
+Bạn có muốn tôi chi tiết hóa thêm mô hình cơ sở dữ liệu (ERD) để minh họa các bảng như Workflow, Template, FieldMapping, DocumentInstance, Provenance không?

@@ -1,0 +1,86 @@
+Tuyệt, tôi sẽ phác thảo mô hình cơ sở dữ liệu (ERD – Entity Relationship Diagram) cho tính năng Cross-template Field Mapping để nhóm kỹ thuật dễ hình dung:
+
+🗂️ Các bảng chính
+1. Workflow
+- workflow_id (PK)
+- name
+- status (draft/active)
+- created_at
+- created_by
+2. WorkflowStep
+- step_id (PK)
+- workflow_id (FK → Workflow)
+- order_index
+- template_id (FK → Template)
+- required (boolean)
+3. Template
+- template_id (PK)
+- name
+- version
+- description
+4. TemplateField
+- field_id (PK)
+- template_id (FK → Template)
+- field_name
+- entity_type (Person, Company, Contract…)
+- data_type (string, date, number…)
+- aliases (JSON/array)
+5. FieldMapping
+- mapping_id (PK)
+- workflow_id (FK → Workflow)
+- from_step_id (FK → WorkflowStep)
+- from_field_id (FK → TemplateField)
+- to_step_id (FK → WorkflowStep)
+- to_field_id (FK → TemplateField)
+- match_type (auto/manual)
+- transform_rule (text/JSON)
+- priority (int)
+6. DocumentInstance
+- document_id (PK)
+- workflow_id (FK → Workflow)
+- step_id (FK → WorkflowStep)
+- template_version
+- status (draft/completed)
+- created_at
+7. FieldValue
+- value_id (PK)
+- document_id (FK → DocumentInstance)
+- field_id (FK → TemplateField)
+- value (text)
+- provenance_id (FK → Provenance)
+8. Provenance
+- provenance_id (PK)
+- source_document_id (FK → DocumentInstance)
+- source_field_id (FK → TemplateField)
+- mapping_id (FK → FieldMapping)
+- timestamp
+- confidence_score
+- transform_applied (boolean)
+9. AuditLog
+- audit_id (PK)
+- workflow_id (FK → Workflow)
+- action (create/update/delete mapping, commit document…)
+- actor
+- timestamp
+- details (JSON)
+
+🔗 Quan hệ chính
+- Workflow 1—N WorkflowStep
+- WorkflowStep N—1 Template
+- Template 1—N TemplateField
+- Workflow 1—N FieldMapping
+- FieldMapping liên kết TemplateField từ step trước → step sau
+- WorkflowStep 1—N DocumentInstance
+- DocumentInstance 1—N FieldValue
+- FieldValue 1—1 Provenance
+- Workflow 1—N AuditLog
+
+🎯 Ý nghĩa
+- Workflow & Steps: định nghĩa quy trình.
+- Template & Fields: định nghĩa cấu trúc dữ liệu.
+- FieldMapping: ánh xạ dữ liệu giữa các bước.
+- DocumentInstance & FieldValue: dữ liệu thực tế khi chạy workflow.
+- Provenance: nguồn gốc dữ liệu, audit rõ ràng.
+- AuditLog: theo dõi mọi hành động để đảm bảo kiểm soát.
+
+Bạn có muốn tôi vẽ thêm sơ đồ ERD dạng ASCII (hình khối với các quan hệ 1—N, N—1) để trực quan hơn không?

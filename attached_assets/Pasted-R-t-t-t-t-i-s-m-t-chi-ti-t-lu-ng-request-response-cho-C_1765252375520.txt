@@ -1,0 +1,79 @@
+Rất tốt 👌, tôi sẽ mô tả chi tiết luồng request–response cho CRUD Provenance – tức là quản lý nguồn gốc dữ liệu của từng field trong document. Đây là phần giúp hệ thống minh bạch và audit rõ ràng.
+
+🔄 CRUD Provenance – Request/Response
+1. Create Provenance
+- UI hành động: khi một field được auto-filled từ document trước, hệ thống tự động ghi provenance.
+- Request (nội bộ, do Prefill Engine gửi):
+POST /documents/{document_id}/provenance
+{
+  "field_id": "dateOfBirth",
+  "source_document_id": 123,
+  "source_field_id": "ngaySinh",
+  "mapping_id": 789,
+  "confidence_score": 0.95,
+  "transform_applied": true
+}
+- Provenance Service: tạo bản ghi provenance.
+- Response:
+{
+  "provenance_id": 555,
+  "status": "created"
+}
+- Audit Log Service: ghi sự kiện create_provenance.
+
+2. Read Provenance
+- UI hành động: người dùng mở tooltip trên field để xem nguồn gốc.
+- Request:
+GET /documents/{document_id}/fields/{field_id}/provenance
+- Provenance Service: truy vấn DB, trả về nguồn gốc.
+- Response:
+{
+  "provenance_id": 555,
+  "source_document_id": 123,
+  "source_field_id": "ngaySinh",
+  "mapping_id": 789,
+  "timestamp": "2025-12-05T12:00:00Z",
+  "confidence_score": 0.95,
+  "transform_applied": true
+}
+
+
+
+3. Update Provenance
+- UI hành động: hiếm khi xảy ra, nhưng có thể khi người dùng override giá trị và hệ thống cần ghi lại provenance mới.
+- Request:
+PUT /documents/{document_id}/provenance/{provenance_id}
+{
+  "override_reason": "user-corrected",
+  "confidence_score": 1.0
+}
+- Provenance Service: cập nhật provenance record.
+- Response:
+{
+  "provenance_id": 555,
+  "status": "updated",
+  "override_reason": "user-corrected"
+}
+- Audit Log Service: ghi sự kiện update_provenance.
+
+4. Delete Provenance
+- UI hành động: thường không cho phép xóa provenance (audit phải bất biến).
+- Request:
+DELETE /documents/{document_id}/provenance/{provenance_id}
+- Provenance Service: từ chối hoặc đánh dấu “inactive” thay vì xóa.
+- Response:
+{
+  "provenance_id": 555,
+  "status": "inactive"
+}
+- Audit Log Service: ghi sự kiện deactivate_provenance.
+
+🎯 Ý nghĩa
+- Create: ghi nguồn gốc khi field được auto-filled hoặc mapped.
+- Read: hiển thị provenance cho người dùng (tooltip, audit panel).
+- Update: ghi lại khi người dùng override hoặc hệ thống điều chỉnh.
+- Delete/Deactivate: hiếm khi dùng, nhưng có thể đánh dấu không hoạt động.
+- Audit log: mọi thao tác đều được ghi lại để minh bạch và kiểm soát.
+
+👉 Với luồng này, hệ thống đảm bảo truy xuất nguồn gốc dữ liệu rõ ràng, giúp người dùng tin tưởng và dễ dàng kiểm tra.
+Bạn có muốn tôi tiếp tục mô tả luồng request–response cho CRUD AuditLog (quản lý nhật ký hành động toàn hệ thống) để hoàn thiện toàn bộ chuỗi quản lý không?

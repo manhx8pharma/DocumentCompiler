@@ -1,0 +1,81 @@
+Hoàn hảo 👌, tôi sẽ bổ sung ví dụ rẽ nhánh cụ thể (Exclusive + Parallel + Merge) bằng sơ đồ ASCII kèm payload mẫu để nhóm dev dễ thử nghiệm.
+
+🧩 Ví dụ Workflow có rẽ nhánh
+Kịch bản: Tuyển dụng nhân sự
+- Step 1: Hợp đồng lao động
+- Step 2: Quyết định bổ nhiệm
+- Step 3a: Đăng ký bảo hiểm (nếu lương ≥ 20 triệu)
+- Step 3b: Đăng ký thẻ nhân viên (nếu lương < 20 triệu)
+- Step 4a: Cấp tài khoản email (song song với Step 3a/3b)
+- Step 5: Merge → Hoàn tất onboarding
+
+⚙️ Payload mẫu
+Exclusive Gateway (Step 2 → Step 3a/3b)
+POST /workflows/{workflow_id}/steps/2/transitions
+{
+  "to_step_id": 3,
+  "condition_group": {
+    "logic": "AND",
+    "conditions": [
+      { "left": "salary", "operator": ">=", "right": 20000000, "transform_rule": "toNumber" }
+    ]
+  },
+  "priority": 1
+}
+
+POST /workflows/{workflow_id}/steps/2/transitions
+{
+  "to_step_id": 3b,
+  "condition_group": {
+    "logic": "AND",
+    "conditions": [
+      { "left": "salary", "operator": "<", "right": 20000000, "transform_rule": "toNumber" }
+    ]
+  },
+  "priority": 2
+}
+
+
+Parallel Gateway (Step 2 → Step 4a)
+POST /workflows/{workflow_id}/steps/2/parallel
+{
+  "branches": [
+    { "to_step_id": 4a }
+  ]
+}
+
+
+Merge Gateway (Step 3a/3b + Step 4a → Step 5)
+POST /workflows/{workflow_id}/steps/5/merge
+{
+  "from_steps": [3a, 3b, 4a],
+  "join_policy": "all"
+}
+
+
+
+🖼️ Sequence Diagram (ASCII)
+Step1 --> Step2
+        |
+        +--[salary >= 20m]--> Step3a (Bảo hiểm)
+        |                     |
+        |                     +--> Step5 (Merge)
+        |
+        +--[salary < 20m]--> Step3b (Thẻ nhân viên)
+                              |
+                              +--> Step5 (Merge)
+
+Step2 --> Step4a (song song cấp email)
+            |
+            +--> Step5 (Merge)
+
+
+
+🎯 Ý nghĩa
+- Exclusive Gateway: chọn nhánh theo điều kiện lương.
+- Parallel Gateway: cấp email song song với nhánh bảo hiểm/thẻ nhân viên.
+- Merge Gateway: gộp tất cả nhánh về Step 5 để hoàn tất onboarding.
+- Audit & Provenance: ghi lại điều kiện đã đánh giá, nhánh được chọn, dữ liệu nguồn.
+
+👉 Với ví dụ này, nhóm dev có thể thử nghiệm ngay logic rẽ nhánh trong workflow.
+Bạn có muốn tôi tiếp tục mô tả cách hiển thị rẽ nhánh trên UI (wireframe) để người dùng dễ thao tác kéo thả và cấu hình điều kiện không?
